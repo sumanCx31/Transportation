@@ -1,5 +1,6 @@
 import { Outlet } from "react-router";
-import "../../assets/css/style.css"
+// import "../../assets/css/style.css"
+import "../../../assets/css/style.css";
 
 const AuthLayout = () => {
   return (

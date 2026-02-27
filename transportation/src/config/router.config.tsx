@@ -1,8 +1,11 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
-import AuthLayout from "../components/layout/authLayout";
+import AuthLayout from "../components/layout/authLayout/authLayout";
 import LoginForm from "../components/loginForm";
 import RegisterForm from "../components/registerForm";
-import AdminPage from "../pages/adminPage";
+import AdminPage from "../components/layout/adminLayout/adminLayout";
+import Dashboard from "../pages/admin/dashboardPage";
+import NotFoundPage from "../pages/not-found-page";
+import BookingsPage from "../pages/admin/bookingPage";
 
 const routerConfig = createBrowserRouter([
   {
@@ -13,10 +16,16 @@ const routerConfig = createBrowserRouter([
         {path:"register", Component:RegisterForm}
     ]
   },
-  {path:"/admin",   Component:AdminPage},
+  {
+    path:"/admin",
+    Component:AdminPage, 
+    children:[
+    {index:true, Component:Dashboard},
+    {path:"bookings", Component:BookingsPage}
+  ]},
   {
     path: "*",
-    Component: () => <div>404 Not Found</div>,
+    Component: NotFoundPage,
   },
 ]);
 
