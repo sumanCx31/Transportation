@@ -45,36 +45,25 @@ const BusCard = ({ bus }: any) => {
 
   return (
     <motion.div
-      whileHover={{ y: -8, scale: 1.02 }}
-      className="relative rounded-2xl overflow-hidden shadow-lg bg-white/70 backdrop-blur-md border border-white/20 transition"
+      whileHover={{ y: -5 }}
+      className="bg-white rounded-2xl shadow-md overflow-hidden border hover:shadow-lg transition"
     >
       {/* IMAGE */}
-      <div className="relative h-44 overflow-hidden">
+      <div className="h-40 overflow-hidden">
         <img
           src={bus.image}
           alt={bus.name}
-          className="w-full h-full object-cover transition duration-500 hover:scale-110"
+          className="w-full h-full object-cover"
         />
-
-        {/* GRADIENT OVERLAY */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-
-        {/* BUS TYPE BADGE */}
-        <span className="absolute top-3 left-3 bg-white/90 text-xs font-semibold px-3 py-1 rounded-full shadow">
-          {bus.type}
-        </span>
-
-        {/* BUS NAME ON IMAGE */}
-        <div className="absolute bottom-3 left-4 text-white">
-          <h2 className="text-lg font-bold">{bus.name}</h2>
-          <p className="text-xs opacity-80">{bus.busNumber}</p>
-        </div>
       </div>
 
       {/* CONTENT */}
       <div className="p-5">
+        <h2 className="text-lg font-bold">{bus.name}</h2>
+        <p className="text-sm text-gray-500">{bus.busNumber}</p>
+
         {/* ROUTE */}
-        <div className="flex items-center gap-2 text-gray-600">
+        <div className="flex items-center gap-2 mt-3 text-gray-600">
           <Navigation size={16} />
           <span className="text-sm">{bus.route}</span>
         </div>
@@ -87,8 +76,8 @@ const BusCard = ({ bus }: any) => {
           </div>
 
           <div>
-            <p className="text-gray-400">Price</p>
-            <p className="font-bold text-blue-600">{bus.price}</p>
+            <p className="text-gray-400">Type</p>
+            <p className="font-semibold">{bus.type}</p>
           </div>
         </div>
 
@@ -97,7 +86,7 @@ const BusCard = ({ bus }: any) => {
           <div className="flex items-center gap-2">
             <Users size={16} />
             <span
-              className={`text-sm font-semibold ${
+              className={`font-semibold ${
                 isFull
                   ? "text-red-500"
                   : bus.seatsAvailable < 5
@@ -112,15 +101,17 @@ const BusCard = ({ bus }: any) => {
                 : `${bus.seatsAvailable} seats`}
             </span>
           </div>
+
+          <p className="font-bold text-blue-600">{bus.price}</p>
         </div>
 
         {/* BUTTON */}
         <button
           disabled={isFull}
-          className={`w-full mt-5 py-2 rounded-xl font-semibold transition-all duration-300 ${
+          className={`w-full mt-5 py-2 rounded-lg font-semibold transition ${
             isFull
               ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-              : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:opacity-90 shadow-md"
+              : "bg-blue-600 text-white hover:bg-blue-700"
           }`}
         >
           {isFull ? "Unavailable" : "View Seats"}
@@ -132,18 +123,12 @@ const BusCard = ({ bus }: any) => {
 
 export default function BusSearchPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200 p-6 mt-20">
-      {/* HEADER */}
-      <motion.h1
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-3xl font-bold mb-8 text-center text-gray-800"
-      >
-        🚌 Find Your Bus
-      </motion.h1>
+    <div className="min-h-screen bg-gray-100 p-6">
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        Available Buses
+      </h1>
 
-      {/* GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {buses.map((bus) => (
           <BusCard key={bus.id} bus={bus} />
         ))}
