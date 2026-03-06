@@ -1,127 +1,134 @@
-'use client';
+"use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import {
-  Menu,
-  X,
-  User,
-  Ticket,
-  Search,
-  CarFront,
-} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, User, Ticket, Search, CarFront, LogIn } from "lucide-react";
 import Button from "./button";
 import logo from "../public/logo.png";
 
 const navLinks = [
   { name: "Home", href: "/", icon: null },
-  { name: "Find Buses", href: "/search-bus", icon: Search },
+  { name: "Find Buses", href: "/bus", icon: Search },
   { name: "For Drivers", href: "/drivers", icon: CarFront },
   { name: "My Tickets", href: "/tickets", icon: Ticket },
 ];
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Sync scroll state for the glass effect
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border/50">
-      <div className="container mx-auto px-2">
-        <div className="flex h-16 items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-[100] p-4 transition-all duration-500">
+      <div 
+        className={`container mx-auto max-w-7xl rounded-[2.5rem] border transition-all duration-500 ${
+          scrolled 
+          ? "bg-slate-900/90 backdrop-blur-2xl border-white/10 shadow-2xl py-2 px-6" 
+          : "bg-white/10 backdrop-blur-xl border-white/20 py-4 px-8"
+        }`}
+      >
+        <div className="flex h-14 items-center justify-between">
+          {/* Logo Section */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center overflow-hidden shadow-lg shadow-emerald-500/20 group-hover:rotate-6 transition-transform">
+              <img
+                src={logo.src}
+                alt="SuvYatra Logo"
+                className="h-8 w-8 object-contain brightness-0 invert"
+              />
+            </div>
 
-          {/* Logo */}
-          {/* Logo */}
-<Link href="/" className="flex items-center gap-2 whitespace-nowrap">
-  <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center overflow-hidden">
-    <img
-      src={logo.src}
-      alt="SuvYatra Logo"
-      className="h-15 object-contain"
-    />
-  </div>
-
-  <span className="text-xl font-bold flex items-center">
-    Suv
-    <span className="text-green-500 ml-1">Yatra</span>
-  </span>
-</Link>
+            <span className="text-xl font-black text-white tracking-tighter uppercase">
+              Suv
+              <span className="text-emerald-500">Yatra</span>
+            </span>
+          </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-5">
+          <div className="hidden md:flex items-center gap-2">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className="
-                  relative inline-flex items-center gap-2 px-2 py-1
-                  text-foreground/80 hover:text-foreground transition
-                  after:absolute after:left-1/2 after:bottom-0
-                  after:h-0.5 after:w-full after:bg-blue-600
-                  after:-translate-x-1/2 after:scale-x-0
-                  after:origin-center after:transition-transform after:duration-300
-                  hover:after:scale-x-100
-                "
+                className="px-4 py-2 text-sm font-bold text-slate-300 hover:text-white transition-all rounded-xl hover:bg-white/5"
               >
-                {link.icon && <link.icon className="w-4 h-4" />}
-                <span>{link.name}</span>
+                <div className="flex items-center gap-2">
+                  {link.icon && <link.icon size={16} className="text-emerald-500" />}
+                  <span>{link.name}</span>
+                </div>
               </Link>
             ))}
           </div>
 
-          {/* Desktop Buttons */}
-          <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost">
-              <User className="w-4 h-4 mr-2" />
-              <a href="http://localhost:5173/">Login</a>
+          {/* Action Buttons */}
+          <div className="hidden md:flex items-center gap-4">
+            <Link 
+              href="http://localhost:5173/" 
+              className="text-sm font-bold text-slate-300 hover:text-emerald-400 transition-colors flex items-center gap-2"
+            >
+              <User size={18} />
+              Login
+            </Link>
+            <Button 
+              variant="accent" 
+              className="bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black rounded-2xl px-6 py-2 shadow-lg shadow-emerald-500/20 border-none"
+            >
+              Sign Up
             </Button>
-            <Button variant="accent">Sign Up</Button>
           </div>
 
           {/* Mobile Toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-muted transition"
+            className="md:hidden p-2.5 rounded-2xl bg-white/5 border border-white/10 text-white transition-all hover:bg-white/10"
           >
-            {isOpen ? <X /> : <Menu />}
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
         {/* Mobile Menu */}
-        {isOpen && (
-          <div className="md:hidden border-t border-border/50 py-4">
-            <div className="flex flex-col gap-2">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className="
-                    relative inline-flex items-center gap-3 px-4 py-3
-                    text-foreground hover:bg-muted rounded-lg transition
-                    after:absolute after:left-1/2 after:bottom-1
-                    after:h-[2px] after:w-[80%] after:bg-primary
-                    after:-translate-x-1/2 after:scale-x-0
-                    after:origin-center after:transition-transform after:duration-300
-                    hover:after:scale-x-100
-                  "
-                >
-                  {link.icon && (
-                    <link.icon className="w-5 h-5 text-primary" />
-                  )}
-                  <span className="font-medium">{link.name}</span>
-                </Link>
-              ))}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden overflow-hidden"
+            >
+              <div className="pt-6 pb-4 flex flex-col gap-3 border-t border-white/10 mt-4">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white/80 hover:text-emerald-400 transition-all border border-transparent hover:border-white/5"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                      {link.icon ? <link.icon size={20} /> : <LogIn size={20} />}
+                    </div>
+                    <span className="font-bold tracking-wide">{link.name}</span>
+                  </Link>
+                ))}
 
-              <div className="mt-4 flex gap-2 px-4">
-                <Button variant="outline" className="flex-1">
-                  Login
-                </Button>
-                <Button variant="accent" className="flex-1">
-                  Sign Up
-                </Button>
+                <div className="mt-4 flex flex-col gap-3">
+                  <Button variant="outline" className="w-full py-4 border-white/10 text-white hover:bg-white/5">
+                    Login
+                  </Button>
+                  <Button variant="accent" className="w-full py-4 bg-emerald-500 text-slate-900 font-black">
+                    Sign Up
+                  </Button>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </nav>
   );

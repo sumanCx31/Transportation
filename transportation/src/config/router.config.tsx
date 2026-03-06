@@ -6,6 +6,7 @@ import AdminPage from "../components/layout/adminLayout/adminLayout";
 import Dashboard from "../pages/admin/dashboardPage";
 import NotFoundPage from "../pages/not-found-page";
 import BookingsPage from "../pages/admin/bookingPage";
+import ActivatePage from "../components/activationPage";
 
 const routerConfig = createBrowserRouter([
   {
@@ -13,7 +14,8 @@ const routerConfig = createBrowserRouter([
     Component: AuthLayout,
     children: [
         {index:true, Component: LoginForm},
-        {path:"register", Component:RegisterForm}
+        {path:"register", Component:RegisterForm},
+        {path:"activate", Component:ActivatePage}
     ]
   },
   {
