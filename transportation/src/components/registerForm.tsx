@@ -1,32 +1,56 @@
 import "../assets/css/style.css";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-import { EmailInput, PasswordInput, TextInput }  from "./formInput/formInput";
+import {
+  EmailInput,
+  ImageInput,
+  PasswordInput,
+  PhoneInput,
+  TextInput,
+} from "./formInput/formInput";
 import { RegisterDTO, type IRegisterFormData } from "./contract";
+import axiosInstance from "../config/axios.config";
+import React from "react";
+import { useNavigate } from "react-router";
 
+const RegisterForm: React.FC = () => {
+  const navigate = useNavigate();
 
-const RegisterForm = () => {
   const {
     control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<IRegisterFormData>({
     defaultValues: {
-      fullName: "",
+      name: "",
       email: "",
       phone: "",
-      profilePhoto: null,
+      gender: "male",
+      role: "admin",
+      address: "",
+      image: null,
       password: "",
       confirmPassword: "",
     },
     resolver: yupResolver(RegisterDTO),
   });
-  const onSubmit: SubmitHandler<IRegisterFormData> = async (data) => {
-    console.log(data);
-    console.log("Form submitted");
 
-    // TODO: API call
+  const onSubmit: SubmitHandler<IRegisterFormData> = async (data) => {
+    try {
+      const response = await axiosInstance.post("/auth/register", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("Response:", response);
+
+      navigate("/");
+    } catch (error: any) {
+      console.log("Registeration Failed! ", error);
+      alert("Invalid credientials");
+    }
   };
+
   return (
     <div className="flex justify-center lg:justify-end">
       <div className="w-full max-w-lg bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2.5rem] p-8 lg:p-10 shadow-2xl animate-fade-in-up">
@@ -37,20 +61,20 @@ const RegisterForm = () => {
           </p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Full Name */}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1.5 ml-1">
-              Full Name
+              Name
             </label>
             <TextInput
               control={control}
-              name={"fullName"}
-              errMsg={errors?.fullName?.message as string}
+              name={"name"}
+              errMsg={errors?.name?.message as string}
             />
           </div>
 
-          {/* Email Address */}
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1.5 ml-1">
               Email Address
@@ -62,58 +86,78 @@ const RegisterForm = () => {
             />
           </div>
 
-          {/* Phone Number & Photo Grid */}
+          {/* Phone & Photo */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1.5 ml-1">
                 Phone Number
               </label>
-              <Controller
-                name="phone"
+              <PhoneInput
                 control={control}
-                render={({ field }) => (
-                  <>
-                    <div>
-                    <input
-                      {...field}
-                      type="tel"
-                      className="w-full px-5 py-3 bg-slate-900/50 border border-white/10 rounded-2xl text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all duration-300 placeholder:text-slate-600"
-                      placeholder="98xxxxxxxx"
-                    />
-                    <p className="text-red-400 text-xs mt-1 ml-1">
-                      {errors?.phone?.message as string}
-                    </p>
-                    </div>
-                  </>
-                )}
+                name={"phone"}
+                errMsg={errors?.phone?.message as string}
               />
             </div>
 
-            
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1.5 ml-1">
                 Profile Photo
               </label>
+              <ImageInput
+                control={control}
+                name={"image"}
+                errMsg={errors?.image?.message as string}
+              />
+            </div>
+          </div>
+
+          {/* Gender & Role */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5 ml-1">
+                Gender
+              </label>
               <Controller
-                name="profilePhoto"
+                name="gender"
                 control={control}
                 render={({ field }) => (
-                  <input
-                    type="file"
-                    onChange={(e) =>
-                      field.onChange(e.target.files?.[0] ?? null)
-                    }
-                    className="w-full text-sm text-slate-400
-        file:mr-4 file:py-2 file:px-4 file:rounded-full
-        file:border-0 file:text-sm file:font-semibold
-        file:bg-emerald-500/10 file:text-emerald-400
-        hover:file:bg-emerald-500/20 cursor-pointer
-        bg-slate-900/50 border border-white/10 rounded-2xl py-1.75 px-2"
-                  />
+                  <select {...field} className="input w-full">
+                    <option value="">Select Gender</option>
+                    <option value="male">male</option>
+                    <option value="female">female</option>
+                  </select>
+                )}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5 ml-1">
+                Role
+              </label>
+              <Controller
+                name="role"
+                control={control}
+                render={({ field }) => (
+                  <select {...field} className="input w-full">
+                    <option value="user">user</option>
+                    <option value="admin">admin</option>
+                  </select>
                 )}
               />
             </div>
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1.5 ml-1">
+              Address
+            </label>
+            <TextInput
+              control={control}
+              name={"address"}
+              errMsg={errors?.name?.message as string}
+            />
+          </div>
+
 
           {/* Password & Confirm Password */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -139,7 +183,6 @@ const RegisterForm = () => {
             </div>
           </div>
 
-         
           <button
             type="submit"
             disabled={isSubmitting}
@@ -151,7 +194,7 @@ const RegisterForm = () => {
               ? "Register for SuvYatra...."
               : "Register for SuvYatra"}
           </button>
-        </form>
+        
 
         <p className="text-center text-slate-400 mt-6 text-sm">
           Already have an account?{" "}
@@ -162,6 +205,7 @@ const RegisterForm = () => {
             Log in here
           </a>
         </p>
+        </form>
       </div>
     </div>
   );

@@ -1,24 +1,37 @@
 import * as Yup from "yup";
 
 export interface IRegisterFormData {
-    fullName: string;
-    email: string;
-    phone: string;
-    profilePhoto?: File | null;
-    password: string;
-    confirmPassword: string;
-  }
+  name: string;
+  email: string;
+  phone: string;
+  gender: string;
+  role: string;
+  address: string;
+  image: File | null;
+  password: string;
+  confirmPassword: string;
+}
 
 export const RegisterDTO: Yup.ObjectSchema<IRegisterFormData> = Yup.object({
-  fullName: Yup.string().required("Full name is required"),
+  name: Yup.string().required("Full name is required"),
+
   email: Yup.string()
     .required("Email is required")
     .email("Invalid email format"),
+
   phone: Yup.string()
     .required("Phone number is required")
     .matches(/^\d{10}$/, "Phone number must be 10 digits"),
 
-  profilePhoto: Yup.mixed<File>().nullable().optional(),
+  gender: Yup.string().required("Gender is required"),
+
+  role: Yup.string()
+    .required("Role is required")
+    .oneOf(["admin", "user"], "Invalid role"),
+
+  address: Yup.string(),
+
+  image: Yup.mixed().nullable().optional(),
 
   password: Yup.string()
     .required("Password is required")
@@ -27,4 +40,4 @@ export const RegisterDTO: Yup.ObjectSchema<IRegisterFormData> = Yup.object({
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Passwords must match")
     .required("Confirm password is required"),
-});
+}) as Yup.ObjectSchema<IRegisterFormData>;

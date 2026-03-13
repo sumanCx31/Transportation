@@ -1,8 +1,10 @@
 import React from "react";
-import { useForm, Controller, type SubmitHandler } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import "../assets/css/style.css";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { EmailInput, PasswordInput } from "./formInput/formInput";
+import authSvc from "../services/Auth.service";
+import { toast } from "sonner";
 
 export interface ICredentials {
   email: string;
@@ -10,6 +12,9 @@ export interface ICredentials {
 }
 
 const LoginForm: React.FC = () => {
+
+  const navigate = useNavigate();
+
   const {
     control,
     handleSubmit,
@@ -22,15 +27,34 @@ const LoginForm: React.FC = () => {
   });
 
   const onSubmit: SubmitHandler<ICredentials> = async (data) => {
-    console.log(data);
-    console.log("Form submitted");
-    
-    // TODO: API call
+    try {
+
+      const response = await authSvc.postRequest("/auth/login", data);
+      console.log("Login response:", response);
+      // store token
+      if (response?.data?.token) {
+        localStorage.setItem("token", response.data.token);
+      }
+      // redirect after login
+      toast.success("Welcome to Admin Panel",{
+        position:"top-right",
+        style:{
+          background:"#28a745",
+          color:'white'
+        }
+      });
+      navigate("/admin");
+      
+    } catch (error: any) {
+      console.error("Login failed:", error);
+      alert("Invalid email or password");
+    }
   };
 
   return (
     <div className="flex justify-center lg:justify-end">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2.5rem] p-10 shadow-2xl animate-fade-in-up">
+
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-white">Welcome Back</h2>
           <p className="text-slate-400 mt-2">
@@ -39,6 +63,7 @@ const LoginForm: React.FC = () => {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+
           {/* Email */}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2 ml-1">
@@ -78,6 +103,7 @@ const LoginForm: React.FC = () => {
               />
               Remember me
             </label>
+
             <a
               href="#"
               className="text-emerald-400 hover:text-emerald-300 font-medium transition"
@@ -86,16 +112,18 @@ const LoginForm: React.FC = () => {
             </a>
           </div>
 
-          {/* Submit */}
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={isSubmitting}
             className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60
-              text-slate-900 font-bold rounded-2xl transition-all transform
-              hover:scale-[1.01] active:scale-95 shadow-lg shadow-emerald-500/20"
+            text-slate-900 font-bold rounded-2xl transition-all transform
+            hover:scale-[1.01] active:scale-95 shadow-lg shadow-emerald-500/20"
           >
             {isSubmitting ? "Signing In..." : "Sign In to SuvYatra"}
           </button>
+
+          {/* Register link */}
           <div>
             <p className="text-center text-slate-400 mt-6 text-sm">
               Don't have an account?{" "}
@@ -107,6 +135,7 @@ const LoginForm: React.FC = () => {
               </Link>
             </p>
           </div>
+
         </form>
       </div>
     </div>
