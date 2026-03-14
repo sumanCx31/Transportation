@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { ImageInput, TextInput } from "../../components/formInput/formInput";
-import authSvc from "../../services/Auth.service";
 import { toast } from "sonner";
 import axiosInstance from "../../config/axios.config";
 

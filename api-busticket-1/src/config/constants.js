@@ -5,7 +5,7 @@ const Status = {
 
 const USER_ROLES = {
     ADMIN: "admin",
-    BUS_OPERATOR: "busoperator",
+    DRIVER: "driver",
     PASSENGER: "passenger",
 }
 

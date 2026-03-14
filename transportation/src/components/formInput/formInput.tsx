@@ -1,9 +1,17 @@
 import { Controller } from "react-hook-form";
+import React from 'react';
+import { Search } from 'lucide-react';
 
 export interface IEmailInputProps {
   control: any;
   name: string;
   errMsg?: string;
+}
+
+interface SearchProps {
+  placeholder?: string;
+  onChange: (value: string) => void;
+  className?: string;
 }
 
 export const EmailInput = ({
@@ -161,6 +169,25 @@ export const ImageInput = ({
     </>
   );
 };
+
+export const SearchInput: React.FC<SearchProps> = ({ 
+  placeholder = "Search...", 
+  onChange, 
+  className = "" 
+}) => {
+  return (
+    <div className={`relative ${className}`}>
+      <Search className="absolute left-4 top-4 text-slate-500" size={20} />
+      <input 
+        type="text" 
+        placeholder={placeholder}
+        className="w-full bg-slate-900 border border-white/5 rounded-2xl py-4 pl-12 pr-6 text-white outline-none focus:border-emerald-500 transition-colors"
+        onChange={(e) => onChange(e.target.value)}
+      />
+    </div>
+  );
+};
+
 
 
 

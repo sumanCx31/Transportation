@@ -19,6 +19,10 @@ class BusController {
   getAllBus = async (req, res) => {
     try {
       const busData = await BusSvc.getAllBus();
+      let len = busData.length;
+      
+      
+      
       res.json({
         data: busData,
         message: "Buses fetched successfully",

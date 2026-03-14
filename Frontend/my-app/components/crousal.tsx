@@ -19,7 +19,7 @@ export default function Carousel() {
   }, []);
 
   return (
-    <div className="relative w-full overflow-hidden rounded-xl">
+    <div className="relative w-full overflow-hidden rounded-xl pt-4">
       {/* Slides */}
       <div className="relative h-56 md:h-96">
         {images.map((src, index) => (

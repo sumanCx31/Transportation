@@ -1,12 +1,4 @@
-import {
-  LayoutDashboard,
-  Bus,
-  Users,
-  Ticket,
-  Settings,
-  Bell,
-  Search,
-} from "lucide-react";
+import { LayoutDashboard, Bus, Users, Ticket, Settings } from "lucide-react";
 import { Outlet } from "react-router";
 
 const AdminPage = () => {
@@ -16,9 +8,7 @@ const AdminPage = () => {
       <aside className="w-64 bg-white/5 border-r border-white/10 hidden lg:flex flex-col p-6 space-y-8">
         <div className="text-2xl font-bold text-white">
           Suv<span className="text-emerald-500">Yatra</span>
-          <span className="block text-xs uppercase text-slate-500 tracking-widest">
-            Admin
-          </span>
+          <span className="block text-xs uppercase text-slate-500 tracking-widest"></span>
         </div>
 
         <nav className="flex-1 space-y-2">
@@ -26,28 +16,42 @@ const AdminPage = () => {
             <NavItem
               icon={<LayoutDashboard size={20} />}
               label="Dashboard"
-              active
+              active={location.pathname === "/admin"}
             />
           </a>
           <a href="/admin/manage-buses">
-            <NavItem icon={<Bus size={20} />} label="Manage Buses" />
+            <NavItem
+              icon={<Bus size={20} />}
+              label="Manage Buses"
+              active={location.pathname.includes("/admin/manage-buses")}
+            />
           </a>
           <a href="/admin/bookings">
-            <NavItem icon={<Ticket size={20} />} label="Bookings" />
+            <NavItem
+              icon={<Ticket size={20} />}
+              label="Bookings"
+              active={location.pathname.includes("/admin/bookings")}
+            />
           </a>
-          <a href="/admin/customers">
-            <NavItem icon={<Users size={20} />} label="Customers" />
+          <a href="/admin/users">
+            <NavItem
+              icon={<Users size={20} />}
+              label="Customers"
+              active={location.pathname.includes("/admin/users")}
+            />
           </a>
           <a href="/admin/settings">
-            <NavItem icon={<Settings size={20} />} label="Settings" />
+            <NavItem
+              icon={<Settings size={20} />}
+              label="Settings"
+              active={location.pathname.includes("/admin/settings")}
+            />
           </a>
         </nav>
       </aside>
 
       {/* Main */}
       <main className="flex-1 p-8 overflow-y-auto">
-        
-
         {/* Stats */}
         <Outlet />
       </main>

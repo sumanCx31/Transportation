@@ -1,6 +1,7 @@
 const { AppConfig } = require("../../config/config");
 const { Status } = require("../../config/constants");
 const { randomStringGenerator } = require("../../utilities/helper");
+const UserModel = require("../user/user.model");
 const userSvc = require("../user/user.service");
 const authSvc = require("./auth.service");
 const bcrypt = require("bcryptjs");
@@ -8,7 +9,6 @@ const jwt = require("jsonwebtoken");
 
 class AuthController {
   registerUser = async (req, res, next) => {
-    
     try {
       const data = await authSvc.transformUserCreate(req);
       let user = await userSvc.createUser(data);
@@ -126,7 +126,7 @@ class AuthController {
       };
       await authSvc.createAuthData(authData);
       console.log("Login success");
-      
+
       res.json({
         data: {
           accessToken: maskedAccessToken,
@@ -343,6 +343,35 @@ class AuthController {
       status: "Sucess",
       options: null,
     });
+  };
+
+  getAllUsers = async (req, res) => {
+    try {
+      // Run both counts in parallel for maximum speed
+      const users = await UserModel.find({
+        role: { $in: ["driver", "passenger"] },
+      })
+        .select("name email role phone address")
+        .lean();
+      const [customerCount, driverCount] = await Promise.all([
+        UserModel.countDocuments({ role: "driver" }),
+        UserModel.countDocuments({ role: "passenger" }),
+      ]);
+
+      const totalUsers = customerCount + driverCount;
+
+      res.json({
+        success: true,
+        data: {
+          Driver: customerCount,
+          passenger: driverCount,
+          TotalUsers: totalUsers,
+          Users: users,
+        },
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Server Error" });
+    }
   };
 }
 
