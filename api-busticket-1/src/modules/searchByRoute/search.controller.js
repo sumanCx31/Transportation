@@ -4,7 +4,7 @@ const SearchController = async (req, res) => {
   try {
     const data = req.body;
     const trips = await searchSvc.searchByRoute(data);
-    
+    console.log(trips)
 
     res.json({
       data: trips,

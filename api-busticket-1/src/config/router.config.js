@@ -1,5 +1,6 @@
 const authRouter = require("../modules/auth/auth.router");
 const bannerRouter = require("../modules/banner/banner.router");
+const bookingRouter = require("../modules/booking/booking.route");
 const busRouter = require("../modules/bus/bus.router");
 const searchRouter = require("../modules/searchByRoute/search.route");
 const TripUpdateRouter = require("../modules/tripUpdation/tripUpdate.route");
@@ -19,5 +20,6 @@ router.use("/banners",bannerRouter);
 router.use("/bus",busRouter);
 router.use("/search",searchRouter)
 router.use("/trip-update",TripUpdateRouter);
+router.use("/book-ticket",bookingRouter);
 
 module.exports = router;

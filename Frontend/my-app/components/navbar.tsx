@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, User, Ticket, Search, CarFront } from "lucide-react";
+import { Menu, X, Ticket, Search, CarFront } from "lucide-react";
 import Button from "./button";
 import logo from "../public/logo.png";
 
