@@ -54,6 +54,21 @@ class TripController {
     }
   };
 
+  getTripById = async(req,res,next)=>{
+    try {
+      const id = req.params.id;
+      const Trip = await TripSvc.searchTripById(id);
+      
+      res.json({
+        data:Trip,
+        status:"Success",
+        messaage:"Trip Data fetched sucessfully!!"
+      })
+    } catch (exception) {
+      throw exception
+    }
+  }
+
 }
 
 const TripCltr = new TripController();

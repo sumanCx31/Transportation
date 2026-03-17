@@ -1,47 +1,150 @@
-const TripModel = require("../tripUpdation/tripUpdate.model");
+// controllers/booking.controller.js
+const Trip = require("../tripUpdation/tripUpdate.model");
 
 class BookingController {
-BookTicket = async (req, res) => {
-  const { busId, routeId, seats, userId } = req.body;
-  const seatNumbers = seats.map(s => s.seatNumber);
 
-  try {
-    // 1. Try to perform the atomic update
-    const result = await TripModel.updateOne(
-      { _id: routeId, "seats.seatNumber": { $in: seatNumbers }, "seats.isBooked": false },
-      { 
-        $set: { 
-          "seats.$[elem].isBooked": true, 
-          "seats.$[elem].status": "pending",
-          "seats.$[elem].reservedBy": userId,
-          "seats.$[elem].reservedAt": new Date() 
-        } 
-      },
-      { arrayFilters: [{ "elem.seatNumber": { $in: seatNumbers } }] }
-    );
+  // 🔹 HOLD SEATS (5 min)
+  holdSeats = async (req, res) => {
+    const { routeId, seats, userId } = req.body;
+    const seatNumbers = seats.map((s) => s.seatNumber);
 
-    // 2. If no modification, check if they are already held by THIS user
-    if (result.modifiedCount === 0) {
-      const trip = await TripModel.findOne({ _id: routeId });
-      const myHeldSeats = trip.seats.filter(s => 
-        seatNumbers.includes(s.seatNumber) && 
-        s.reservedBy === userId && 
-        s.status === "pending"
+    try {
+      const now = new Date();
+      const expiryTime = new Date(now.getTime() - 5 * 60 * 1000);
+
+      const result = await Trip.updateOne(
+        {
+          _id: routeId,
+          seats: {
+            $not: {
+              $elemMatch: {
+                seatNumber: { $in: seatNumbers },
+                status: { $ne: "available" },
+                reservedBy: { $ne: userId },
+                reservedAt: { $gt: expiryTime },
+              },
+            },
+          },
+        },
+        {
+          $set: {
+            "seats.$[elem].status": "pending",
+            "seats.$[elem].reservedBy": userId,
+            "seats.$[elem].reservedAt": now,
+          },
+        },
+        {
+          arrayFilters: [
+            { "elem.seatNumber": { $in: seatNumbers } },
+          ],
+        }
       );
 
-      if (myHeldSeats.length === seatNumbers.length) {
-        return res.status(200).json({ message: "You already have these seats on hold. Proceed to payment." });
+      if (result.modifiedCount === 0) {
+        return res.status(409).json({
+          message: "Seats are already taken or temporarily locked!",
+        });
       }
 
-      return res.status(409).json({ message: "Seats are already taken by someone else!" });
+      return res.status(200).json({
+        message: "Seats held for 5 minutes. Proceed to payment.",
+      });
+
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
     }
-    
-    res.status(200).json({ message: "Seats held for 5 minutes. Proceed to payment." });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+  };
+
+  // 🔹 CONFIRM BOOKING
+  confirmBooking = async (req, res) => {
+    const { routeId, userId } = req.body;
+
+    try {
+      await Trip.updateOne(
+        { _id: routeId },
+        {
+          $set: {
+            "seats.$[elem].status": "booked",
+          },
+        },
+        {
+          arrayFilters: [
+            {
+              "elem.reservedBy": userId,
+              "elem.status": "pending",
+            },
+          ],
+        }
+      );
+
+      return res.status(200).json({
+        message: "Booking confirmed successfully!",
+      });
+
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  };
+
+  // 🔹 RELEASE SEATS (MANUAL CANCEL)
+  releaseSeats = async (req, res) => {
+    const { routeId, userId } = req.body;
+
+    try {
+      await Trip.updateOne(
+        { _id: routeId },
+        {
+          $set: {
+            "seats.$[elem].status": "available",
+            "seats.$[elem].reservedBy": null,
+            "seats.$[elem].reservedAt": null,
+          },
+        },
+        {
+          arrayFilters: [
+            {
+              "elem.reservedBy": userId,
+              "elem.status": "pending",
+            },
+          ],
+        }
+      );
+
+      return res.status(200).json({
+        message: "Seats released successfully!",
+      });
+
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
+  };
+
+  // 🔹 AUTO RELEASE EXPIRED SEATS
+  autoReleaseExpired = async () => {
+    const expiryTime = new Date(Date.now() - 5 * 60 * 1000);
+
+    await Trip.updateMany(
+      {},
+      {
+        $set: {
+          "seats.$[elem].status": "available",
+          "seats.$[elem].reservedBy": null,
+          "seats.$[elem].reservedAt": null,
+        },
+      },
+      {
+        arrayFilters: [
+          {
+            "elem.status": "pending",
+            "elem.reservedAt": { $lt: expiryTime },
+          },
+        ],
+      }
+    );
+
+    console.log("Expired seats released");
+  };
 }
 
 const bookcltr = new BookingController();
-module.exports = bookcltr
+module.exports  = bookcltr
