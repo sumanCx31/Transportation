@@ -1,8 +1,22 @@
+const userSvc = require("../user/user.service");
 const BusSvc = require("./bus.service");
 
 class BusController {
   Create = async (req, res, next) => {
     try {
+      const data = req.body;
+      // console.log(data);
+      const userId = data.driverId;
+      const findRole = await userSvc.getRoleByFilter(userId);
+      // console.log(findRole);
+      
+      if(findRole!=='driver'){
+        throw({
+          code:403,
+          message:"Role must be a driver!!!",
+          status:"Driver Needed!"
+        })
+      }
       const transformData = await BusSvc.transformBus(req);
       const createBus1 = await BusSvc.createBus(transformData);
 

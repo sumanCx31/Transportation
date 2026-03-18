@@ -36,6 +36,19 @@ class UserService {
       throw exception;
     }
   };
+  getRoleByFilter = async (filter) => {
+    try {
+      const userData = await UserModel.find({_id:filter});
+      // console.log(userData);
+      
+      const role = userData[0].role;
+      // console.log("role=",role);
+      
+      return role;
+    } catch (exception) {
+      throw exception;
+    }
+  };
   async updateSingleUserByFilter (filter, data) {
     try {
         const userData = await UserModel.findOneAndUpdate(filter, {$set: data}, {new:true})

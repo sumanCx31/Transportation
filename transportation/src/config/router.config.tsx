@@ -13,6 +13,8 @@ import AddBus from "../pages/admin/addBus";
 import Activate from "../components/activate";
 import Users from "../pages/admin/users";
 import viewRoutes from "../pages/admin/viewRoutes";
+import DriverPage from "../components/layout/adminLayout/driverLayout";
+import DriverDashboard from "../pages/driver/dashboardPage";
 
 const routerConfig = createBrowserRouter([
   {
@@ -35,6 +37,14 @@ const routerConfig = createBrowserRouter([
       { path: "manage-buses/view-routes/:busId", Component: viewRoutes },
       { path: "users", Component: Users },
     ],
+  },
+  {
+    path:"/driver",
+    Component:DriverPage,
+    children:[{
+      index:true,element:<DriverDashboard/>
+    },
+  {path:"trip-update",Component:AddBus}]
   },
   {
     path: "*",

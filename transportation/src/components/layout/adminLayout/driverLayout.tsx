@@ -1,7 +1,7 @@
 import { LayoutDashboard, Bus, Users, Ticket, Settings, MessageCircle } from "lucide-react";
 import { Outlet } from "react-router";
 
-const AdminPage = () => {
+const DriverPage = () => {
   return (
     <div className="flex min-h-screen bg-slate-900 text-slate-200 font-sans">
       {/* Sidebar */}
@@ -12,34 +12,28 @@ const AdminPage = () => {
         </div>
 
         <nav className="flex-1 space-y-2">
-          <a href="/admin">
+          <a href="/driver">
             <NavItem
               icon={<LayoutDashboard size={20} />}
               label="Dashboard"
-              active={location.pathname === "/admin"}
+              active={location.pathname === "/driver"}
             />
           </a>
-          <a href="/admin/manage-buses">
+          <a href="/driver/update-trip">
             <NavItem
               icon={<Bus size={20} />}
               label="Manage Buses"
               active={location.pathname.includes("/admin/manage-buses")}
             />
           </a>
-          <a href="/admin/bookings">
+          <a href="/driver/view-booking">
             <NavItem
               icon={<Ticket size={20} />}
               label="Bookings"
               active={location.pathname.includes("/admin/bookings")}
             />
           </a>
-          <a href="/admin/users">
-            <NavItem
-              icon={<Users size={20} />}
-              label="Customers"
-              active={location.pathname.includes("/admin/users")}
-            />
-          </a>
+
           <a href="/driver/settings">
             <NavItem
               icon={<MessageCircle size={20} />}
@@ -47,7 +41,8 @@ const AdminPage = () => {
               active={location.pathname.includes("/admin/settings")}
             />
           </a>
-          <a href="/admin/settings">
+          
+          <a href="/driver/settings">
             <NavItem
               icon={<Settings size={20} />}
               label="Settings"
@@ -82,4 +77,4 @@ const NavItem = ({ icon, label, active = false }: any) => (
   </button>
 );
 
-export default AdminPage;
+export default DriverPage;

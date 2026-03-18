@@ -61,6 +61,10 @@ const BusSchema = new mongoose.Schema(
       enum: Object.values(Status),
       default: Status.INACTIVE,
     },
+    driverId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
 
     createdBy: {
       type: mongoose.Types.ObjectId,
@@ -78,7 +82,7 @@ const BusSchema = new mongoose.Schema(
     autoCreate: true,
     autoIndex: true,
     timestamps: true,
-  }
+  },
 );
 
 const BusModel = mongoose.model("Bus", BusSchema);
