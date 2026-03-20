@@ -1,4 +1,4 @@
-import "../assets/css/style.css";
+import "../../assets/css/style.css";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import {
@@ -7,9 +7,9 @@ import {
   PasswordInput,
   PhoneInput,
   TextInput,
-} from "./formInput/formInput";
-import { RegisterDTO, type IRegisterFormData } from "./contract";
-import axiosInstance from "../config/axios.config";
+} from "../formInput/formInput";
+import { RegisterDTO, type IRegisterFormData } from "../contract";
+import axiosInstance from "../../config/axios.config";
 import React from "react";
 import { useNavigate } from "react-router";
 

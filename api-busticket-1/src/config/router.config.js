@@ -1,3 +1,4 @@
+const driverRoute = require("../modules/admin/driver.route");
 const authRouter = require("../modules/auth/auth.router");
 const bannerRouter = require("../modules/banner/banner.router");
 const busRouter = require("../modules/bus/bus.router");
@@ -21,5 +22,6 @@ router.use("/bus",busRouter);
 router.use("/search",searchRouter)
 router.use("/trip-update",TripUpdateRouter);
 router.use("/book-ticket",bookingRouter);
+router.use("/driver-bus",driverRoute)
 
 module.exports = router;

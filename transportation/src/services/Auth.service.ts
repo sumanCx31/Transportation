@@ -1,6 +1,8 @@
 import HttpService from "./base.service";
 
-class AuthService extends HttpService {}
+class AuthService extends HttpService {
 
-const authSvc = new AuthService()
-export default authSvc
+}
+
+const authSvc = new AuthService();
+export default authSvc;

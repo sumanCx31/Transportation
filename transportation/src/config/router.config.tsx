@@ -1,20 +1,23 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import AuthLayout from "../components/layout/authLayout/authLayout";
-import LoginForm from "../components/loginForm";
+import LoginForm from "../components/auth/loginForm";
 import AdminPage from "../components/layout/adminLayout/adminLayout";
 import Dashboard from "../pages/admin/dashboardPage";
 import NotFoundPage from "../pages/not-found-page";
 import BookingsPage from "../pages/admin/bookingPage";
-import RegisterForm from "../components/registerForm";
+import RegisterForm from "../components/auth/registerForm";
 
 import { Toaster } from "sonner";
 import ManageBus from "../pages/admin/manageBus";
 import AddBus from "../pages/admin/addBus";
-import Activate from "../components/activate";
+import Activate from "../components/auth/activate";
 import Users from "../pages/admin/users";
 import viewRoutes from "../pages/admin/viewRoutes";
 import DriverPage from "../components/layout/adminLayout/driverLayout";
 import DriverDashboard from "../pages/driver/dashboardPage";
+import AddTripForm from "../pages/driver/addBus";
+import SuvYatraTripForm from "../pages/driver/addBus";
+import { AuthProvider } from "../context/auth.context";
 
 const routerConfig = createBrowserRouter([
   {
@@ -44,7 +47,7 @@ const routerConfig = createBrowserRouter([
     children:[{
       index:true,element:<DriverDashboard/>
     },
-  {path:"trip-update",Component:AddBus}]
+  {path:"trip-update",Component:SuvYatraTripForm}]
   },
   {
     path: "*",
@@ -55,8 +58,10 @@ const routerConfig = createBrowserRouter([
 const RouterConfig = () => {
   return (
     <>
-      <Toaster richColors closeButton />
+     <AuthProvider>
+       <Toaster richColors closeButton />
       <RouterProvider router={routerConfig} />
+     </AuthProvider>
     </>
   );
 };

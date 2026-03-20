@@ -1,10 +1,11 @@
 import React from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import "../assets/css/style.css";
+import "../../assets/css/style.css";
 import { Link, useNavigate } from "react-router";
-import { EmailInput, PasswordInput } from "./formInput/formInput";
-import authSvc from "../services/Auth.service";
+import { EmailInput, PasswordInput } from "../formInput/formInput";
+import authSvc from "../../services/Auth.service";
 import { toast } from "sonner";
+import { useAuth } from "../../context/auth.context";
 
 export interface ICredentials {
   email: string;
@@ -12,7 +13,6 @@ export interface ICredentials {
 }
 
 const LoginForm: React.FC = () => {
-
   const navigate = useNavigate();
 
   const {
@@ -26,25 +26,41 @@ const LoginForm: React.FC = () => {
     },
   });
 
+  const {setLoggedInUserProfile} = useAuth();
+
   const onSubmit: SubmitHandler<ICredentials> = async (data) => {
     try {
-
       const response = await authSvc.postRequest("/auth/login", data);
+
       console.log("Login response:", response);
-      // store token
-      if (response?.data?.token) {
-        localStorage.setItem("token", response.data.token);
+
+      if (response) {
+        localStorage.setItem("accessToken", response.data.accessToken);
+        localStorage.setItem("refreshToken", response.data.refreshToken);
       }
-      // redirect after login
-      toast.success("Welcome to Admin Panel",{
-        position:"top-right",
-        style:{
-          background:"#28a745",
-          color:'white'
-        }
+      const getUser = async () => {
+        const res = await authSvc.getRequest("/auth/me");
+        return res;
+       
+      };
+      const getUserData = await getUser();
+
+      toast.success(`Welcome to ${getUserData.data.role}`, {
+        position: "top-right",
+        style: {
+          background: "#28a745",
+          color: "white",
+        },
       });
-      navigate("/admin");
+      console.log("UserDetail:  ",getUserData.data);
       
+      setLoggedInUserProfile(getUserData.data,)
+
+      // Add slight delay for debugging (optional)
+      setTimeout(() => {
+        navigate("/"+getUserData.data.role);
+      }, 300);
+
     } catch (error: any) {
       console.error("Login failed:", error);
       alert("Invalid email or password");
@@ -54,16 +70,12 @@ const LoginForm: React.FC = () => {
   return (
     <div className="flex justify-center lg:justify-end">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2.5rem] p-10 shadow-2xl animate-fade-in-up">
-
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-white">Welcome Back</h2>
-          <p className="text-slate-400 mt-2">
-            Sign in to manage your bookings
-          </p>
+          <p className="text-slate-400 mt-2">Sign in to manage your bookings</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-
           {/* Email */}
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2 ml-1">
@@ -135,7 +147,6 @@ const LoginForm: React.FC = () => {
               </Link>
             </p>
           </div>
-
         </form>
       </div>
     </div>

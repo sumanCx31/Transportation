@@ -7,7 +7,7 @@ const { RegisterDTO, ResetPasswordRequestDTO, ResetPasswordDataDTO } = require("
 
 const authCtrl = new AuthController()
 
-authRouter.post("/register",uploader().single('image'),bodyValidator(RegisterDTO),authCtrl.registerUser)
+authRouter.post("s/register",uploader().single('image'),bodyValidator(RegisterDTO),authCtrl.registerUser)
 authRouter.get("/activate/:token",authCtrl.activateUser )
 authRouter.post("/login", authCtrl.loginUser)
 authRouter.get("/me",auth(), authCtrl.loggedInUserProfile)

@@ -12,6 +12,17 @@ export interface IRegisterFormData {
   confirmPassword: string;
 }
 
+export enum UserRoles{
+  ADMIN='admin',
+  DRIVER='driver',
+  PASSENGER = 'passenger'
+}
+
+export enum Status{
+  ACTIVE='active',
+  INACTIVE='inactive',
+}
+
 export const RegisterDTO: Yup.ObjectSchema<IRegisterFormData> = Yup.object({
   name: Yup.string().required("Full name is required"),
 

@@ -1,5 +1,5 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { EmailInput } from "./formInput/formInput";
+import { EmailInput } from "../formInput/formInput";
 
 export interface ICrediential{
     email:string;

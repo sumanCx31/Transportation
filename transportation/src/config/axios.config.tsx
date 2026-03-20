@@ -5,9 +5,18 @@ const axiosInstance = axios.create({
   timeout: 30000,
   timeoutErrorMessage: "Server timed out...",
   responseType: "json",
-  
+  headers:{
+    "Content-Type":"application/json"
+  } 
 })
 
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("accessToken") || null;
+  if(token){
+    config.headers.Authorization = "Bearer "+token
+  }
+  return config
+})
 // axios interceptors
 
 axiosInstance.interceptors.response.use(
