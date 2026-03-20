@@ -6,9 +6,13 @@ const { BusValidatorDTO } = require('./bus.validator');
 
 const busRouter = require('express').Router();
 
-busRouter.post("/",auth,uploader().single("image"),bodyValidator(BusValidatorDTO),BusCltr.Create);
+busRouter.post("/",uploader().single("image"),bodyValidator(BusValidatorDTO),BusCltr.Create);
 busRouter.get("/",BusCltr.getAllBus);
 busRouter.get("/:id",BusCltr.getBusById);
 busRouter.delete("/:id",BusCltr.deleteBusById);
+
+
+busRouter.get("/driver/:id",BusCltr.getBusByDriverId);
+
 
 module.exports = busRouter;

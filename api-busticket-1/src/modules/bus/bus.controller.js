@@ -1,4 +1,5 @@
 const userSvc = require("../user/user.service");
+const BusModel = require("./bus.model");
 const BusSvc = require("./bus.service");
 
 class BusController {
@@ -80,7 +81,27 @@ class BusController {
     } catch (exception) {
         throw exception
     }
-  }
+  };
+
+  getBusByDriverId = async(req,res)=>{
+    try {
+      const _id = req.params.id;
+      const getBus = await BusModel.find({driverId:_id});
+      if(!getBus){
+        throw({
+          data:404,
+          message:"Bus with this provided driverId is not found!!"
+        })
+      }
+      res.json({
+        data:getBus,
+        status:"success",
+        message:"Bus Fetched based on this driver id!!"
+      })
+    } catch (exception) {
+      throw exception
+    }
+  };
 }
 const BusCltr = new BusController();
 module.exports = BusCltr;

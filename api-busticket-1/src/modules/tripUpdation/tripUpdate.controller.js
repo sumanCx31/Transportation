@@ -1,3 +1,4 @@
+const TripModel = require("./tripUpdate.model");
 const TripSvc = require("./tripUpdate.service");
 
 class TripController {
@@ -7,7 +8,7 @@ class TripController {
       const storeData = await TripSvc.storeTrip(data);
 
       const bookedSeats = storeData.trip.seats.filter(
-        (seat) => seat.isBooked
+        (seat) => seat.isBooked,
       ).length;
 
       const remainingSeats = 32 - bookedSeats;
@@ -15,17 +16,16 @@ class TripController {
       res.json({
         data: {
           storeData,
-          remainingSeats
+          remainingSeats,
         },
         message: "Trip added successfully",
         status: "success",
         option: null,
       });
-
     } catch (exception) {
       next(exception);
     }
-  }
+  };
 
   updateById = async (req, res, next) => {
     try {
@@ -54,21 +54,44 @@ class TripController {
     }
   };
 
-  getTripById = async(req,res,next)=>{
+  getTripById = async (req, res, next) => {
     try {
       const id = req.params.id;
       const Trip = await TripSvc.searchTripById(id);
-      
-      res.json({
-        data:Trip,
-        status:"Success",
-        messaage:"Trip Data fetched sucessfully!!"
-      })
-    } catch (exception) {
-      throw exception
-    }
-  }
 
+      res.json({
+        data: Trip,
+        status: "Success",
+        messaage: "Trip Data fetched sucessfully!!",
+      });
+    } catch (exception) {
+      throw exception;
+    }
+  };
+
+  getTripByBusId = async (req, res) => {
+    try {
+      const busId = req.params.id;
+      const trips = await TripModel.find({ bus: busId }).populate("bus");
+      if (!trips || trips.length === 0) {
+        return res.status(404).json({
+          status: "error",
+          message: "No trips scheduled for this bus yet.",
+        });
+      }
+
+      res.json({
+        status: "success",
+        data: trips,
+      });
+    } catch (error) {
+      // If busId is not a valid 24-char hex string, this catch will trigger
+      res.status(500).json({
+        status: "error",
+        message: error.message,
+      });
+    }
+  };
 }
 
 const TripCltr = new TripController();

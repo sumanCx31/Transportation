@@ -89,10 +89,10 @@ const DriverPage = () => {
             />
           </a>
 
-          <a href="/driver/trip-update">
+          <a href="/driver/my-bus">
             <NavItem
               icon={<Bus size={20} />}
-              label="View Trips"
+              label="My Bus"
               active={location.pathname.includes("/driver/trip-update")}
             />
           </a>

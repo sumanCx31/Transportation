@@ -15,9 +15,12 @@ import Users from "../pages/admin/users";
 import viewRoutes from "../pages/admin/viewRoutes";
 import DriverPage from "../components/layout/adminLayout/driverLayout";
 import DriverDashboard from "../pages/driver/dashboardPage";
-import AddTripForm from "../pages/driver/addBus";
-import SuvYatraTripForm from "../pages/driver/addBus";
+import AddTripForm from "../pages/driver/addTrip";
+import SuvYatraTripForm from "../pages/driver/addTrip";
 import { AuthProvider } from "../context/auth.context";
+import DriverBusPage from "../pages/driver/driverBusPage";
+import DriverTripPage from "../pages/driver/driverTripPage";
+import CreateTripPage from "../pages/driver/addTrip";
 
 const routerConfig = createBrowserRouter([
   {
@@ -42,12 +45,17 @@ const routerConfig = createBrowserRouter([
     ],
   },
   {
-    path:"/driver",
-    Component:DriverPage,
-    children:[{
-      index:true,element:<DriverDashboard/>
-    },
-  {path:"trip-update",Component:SuvYatraTripForm}]
+    path: "/driver",
+    Component: DriverPage,
+    children: [
+      {
+        index: true,
+        element: <DriverDashboard />,
+      },
+      { path: "my-bus", Component: DriverBusPage },
+      { path: "trip-update/:busId",Component:DriverTripPage },
+      {path:"add-trip/:busId",Component:CreateTripPage}
+    ],
   },
   {
     path: "*",
@@ -58,10 +66,10 @@ const routerConfig = createBrowserRouter([
 const RouterConfig = () => {
   return (
     <>
-     <AuthProvider>
-       <Toaster richColors closeButton />
-      <RouterProvider router={routerConfig} />
-     </AuthProvider>
+      <AuthProvider>
+        <Toaster richColors closeButton />
+        <RouterProvider router={routerConfig} />
+      </AuthProvider>
     </>
   );
 };
