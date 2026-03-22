@@ -70,28 +70,39 @@ class TripController {
   };
 
   getTripByBusId = async (req, res) => {
-    try {
-      const busId = req.params.id;
-      const trips = await TripModel.find({ bus: busId }).populate("bus");
-      if (!trips || trips.length === 0) {
-        return res.status(404).json({
-          status: "error",
-          message: "No trips scheduled for this bus yet.",
-        });
-      }
+  try {
+    const busId = req.params.id;
+    const trips = await TripModel.find({ bus: busId }).populate("bus");
 
+    // Return 200 OK with an empty array instead of 404
+    res.json({
+      status: "success",
+      data: trips || [], // Send [] if no trips exist
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+  seatReservation = async(req,res)=>{
+    try {
+      const _id = req.params.id;
+      const Seats = req.body;
+      const reserveSeat = await TripSvc.reserveSeat(_id,Seats);
+      // console.log(reserveSeat);
+      
       res.json({
-        status: "success",
-        data: trips,
-      });
-    } catch (error) {
-      // If busId is not a valid 24-char hex string, this catch will trigger
-      res.status(500).json({
-        status: "error",
-        message: error.message,
-      });
+        data:reserveSeat,
+        status:"Sucess",
+        message:"Your Seat Reserved!!"
+      })
+    } catch (exception) {
+      throw exception
     }
-  };
+  }
 }
 
 const TripCltr = new TripController();

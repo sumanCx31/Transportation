@@ -22,3 +22,28 @@ axiosInstance.interceptors.request.use((config) => {
   }
   return config;
 });
+
+
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response.data
+  },
+  async (error) => {
+    if(error.response) {
+      // 
+      const {status, data} = error.response;
+        throw {
+          status,
+          data,
+          message: error.message,
+        };
+    } 
+    else if(error.request) {
+      console.error("No Response: ", error.request)
+    } else {
+      console.error("Request Error", error.message)
+    }
+  }
+);
+
+export default axiosInstance

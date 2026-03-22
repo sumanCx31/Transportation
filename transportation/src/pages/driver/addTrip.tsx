@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import authSvc from "../../services/Auth.service";
 import {
@@ -20,8 +20,9 @@ const CreateTripPage = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
-    bus: busId || "",
+    bus: busId ?? "",
     from: "",
     to: "",
     price: "",
@@ -31,18 +32,24 @@ const CreateTripPage = () => {
     date: "",
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  // 🔹 Handle input change (generic)
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // 🔹 Submit form
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    setLoading(true);
+
     try {
-      // Note: Ensure your backend expects price as a Number
-      const payload = { ...formData, price: Number(formData.price) };
+      setLoading(true);
+
+      const payload = {
+        ...formData,
+        price: Number(formData.price), // convert to number
+      };
+
       await authSvc.postRequest("/trip-update", payload);
 
       toast.success("Trip is Live!", {
@@ -51,17 +58,20 @@ const CreateTripPage = () => {
           background: "#0f172a",
           color: "#fff",
           borderRadius: "1rem",
-          borderLeft: "4px solid #10b981", // Adds a thick emerald accent on the left
+          borderLeft: "4px solid #10b981",
         },
       });
+
       navigate(`/driver/trip-update/${busId}`);
-    } catch (err) {
-      console.error("Failed to create trip:", err);
-      alert("Error creating trip. Please check your data.");
+    } catch (error) {
+      console.error("Trip creation failed:", error);
+      alert("Something went wrong!");
     } finally {
       setLoading(false);
     }
   };
+
+  // JSX continues...
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-8">

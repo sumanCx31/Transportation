@@ -21,6 +21,7 @@ import { AuthProvider } from "../context/auth.context";
 import DriverBusPage from "../pages/driver/driverBusPage";
 import DriverTripPage from "../pages/driver/driverTripPage";
 import CreateTripPage from "../pages/driver/addTrip";
+import DriverSeatReservation from "../pages/driver/driverSeatReservation";
 
 const routerConfig = createBrowserRouter([
   {
@@ -54,7 +55,8 @@ const routerConfig = createBrowserRouter([
       },
       { path: "my-bus", Component: DriverBusPage },
       { path: "trip-update/:busId",Component:DriverTripPage },
-      {path:"add-trip/:busId",Component:CreateTripPage}
+      {path:"add-trip/:busId",Component:CreateTripPage},
+      {path:"seat-reservation/:tripId",Component:DriverSeatReservation}
     ],
   },
   {

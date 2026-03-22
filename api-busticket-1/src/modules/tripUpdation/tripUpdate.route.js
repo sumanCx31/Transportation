@@ -6,6 +6,7 @@ const { TripValidateDTO } = require("./tripUpdate.validator");
 
 TripUpdateRouter.post("/", bodyValidator(TripValidateDTO), TripCltr.create);
 TripUpdateRouter.get("/:id", TripCltr.getTripById);
+TripUpdateRouter.patch("/seat-reserve/:id",TripCltr.seatReservation)
 TripUpdateRouter.put(
   "/:id",
   bodyValidator(TripValidateDTO),
