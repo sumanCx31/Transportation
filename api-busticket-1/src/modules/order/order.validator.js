@@ -14,8 +14,6 @@ const createOrderValidator = Joi.object({
 
   trip: Joi.string().custom(objectId).required(),
 
-  bus: Joi.string().custom(objectId).required(),
-
   seats: Joi.array()
     .items(Joi.string().required())
     .min(1)

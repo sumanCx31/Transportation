@@ -351,7 +351,7 @@ class AuthController {
       const users = await UserModel.find({
         role: { $in: ["driver", "passenger"] },
       })
-        .select("name email role phone address")
+        .select("name email role phone address image")
         .lean();
       const [customerCount, driverCount] = await Promise.all([
         UserModel.countDocuments({ role: "driver" }),

@@ -21,13 +21,6 @@ const OrderSchema = new mongoose.Schema(
       required: true,
     },
 
-    // 🔹 Bus reference (optional but useful)
-    bus: {
-      type: mongoose.Types.ObjectId,
-      ref: "Bus",
-      required: true,
-    },
-
     // 🔹 Seat numbers (multiple seats)
     seats: [
       {

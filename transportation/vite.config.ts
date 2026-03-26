@@ -8,4 +8,14 @@ export default defineConfig({
     tailwindcss(),
     react()
   ],
+  server: {
+    proxy: {
+      // This tells Vite: "If a request starts with /api, send it to the backend"
+      '/api': {
+        target: 'http://localhost:9005', 
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 })

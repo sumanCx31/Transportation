@@ -15,13 +15,16 @@ import Users from "../pages/admin/users";
 import viewRoutes from "../pages/admin/viewRoutes";
 import DriverPage from "../components/layout/adminLayout/driverLayout";
 import DriverDashboard from "../pages/driver/dashboardPage";
-import AddTripForm from "../pages/driver/addTrip";
-import SuvYatraTripForm from "../pages/driver/addTrip";
 import { AuthProvider } from "../context/auth.context";
 import DriverBusPage from "../pages/driver/driverBusPage";
 import DriverTripPage from "../pages/driver/driverTripPage";
 import CreateTripPage from "../pages/driver/addTrip";
 import DriverSeatReservation from "../pages/driver/driverSeatReservation";
+import PaymentVerify from "../pages/payment/verify.payment";
+import ChatPage from "../pages/chat/chat.page";
+import BannerPage from "../pages/admin/banner";
+import AddBanner from "../components/Admin/addBanner";
+import updateBanner from "../components/Admin/updateBannner";
 
 const routerConfig = createBrowserRouter([
   {
@@ -34,6 +37,10 @@ const routerConfig = createBrowserRouter([
     ],
   },
   {
+    path: "/payment/verify",
+    Component: PaymentVerify,
+  },
+  {
     path: "/admin",
     Component: AdminPage,
     children: [
@@ -42,7 +49,11 @@ const routerConfig = createBrowserRouter([
       { path: "manage-buses", Component: ManageBus },
       { path: "manage-buses/add-bus", Component: AddBus },
       { path: "manage-buses/view-routes/:busId", Component: viewRoutes },
+      { path: "banners/add-banner", Component: AddBanner },
+      { path: "banners/update/:_id", Component: updateBanner },
+      { path: "banners", Component: BannerPage },
       { path: "users", Component: Users },
+      { path: "chat", Component: ChatPage },
     ],
   },
   {
@@ -54,9 +65,10 @@ const routerConfig = createBrowserRouter([
         element: <DriverDashboard />,
       },
       { path: "my-bus", Component: DriverBusPage },
-      { path: "trip-update/:busId",Component:DriverTripPage },
-      {path:"add-trip/:busId",Component:CreateTripPage},
-      {path:"seat-reservation/:tripId",Component:DriverSeatReservation}
+      { path: "trip-update/:busId", Component: DriverTripPage },
+      { path: "add-trip/:busId", Component: CreateTripPage },
+      { path: "seat-reservation/:tripId", Component: DriverSeatReservation },
+      { path: "chat", Component: ChatPage },
     ],
   },
   {

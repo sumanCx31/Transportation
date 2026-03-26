@@ -7,7 +7,7 @@ const { RegisterDTO, ResetPasswordRequestDTO, ResetPasswordDataDTO } = require("
 
 const authCtrl = new AuthController()
 
-authRouter.post("s/register",uploader().single('image'),bodyValidator(RegisterDTO),authCtrl.registerUser)
+authRouter.post("/register",uploader().single('image'),bodyValidator(RegisterDTO),authCtrl.registerUser)
 authRouter.get("/activate/:token",authCtrl.activateUser )
 authRouter.post("/login", authCtrl.loginUser)
 authRouter.get("/me",auth(), authCtrl.loggedInUserProfile)
@@ -16,7 +16,7 @@ authRouter.get("/refresh", authCtrl.refreshToken)
 authRouter.post("/forget-password",bodyValidator(ResetPasswordRequestDTO),authCtrl.forgetPasswordRequest)
 authRouter.get("/forget-password-verify/:token", authCtrl.forgetPasswordTokenVerify)
 authRouter.put("/reset-password",bodyValidator(ResetPasswordDataDTO),authCtrl.resetPassword)
-authRouter.get("/getuser",authCtrl.getAllUsers);
+authRouter.get("/user",authCtrl.getAllUsers);
 
 
 authRouter.put("/user/:id",authCtrl.updateUserById)

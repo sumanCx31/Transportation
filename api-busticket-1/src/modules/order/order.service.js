@@ -4,9 +4,9 @@ const TripModel = require("../tripUpdation/tripUpdate.model");
 class OrderService {
   create = async (data) => {
     try {
-      const { user, trip, bus, seats, paymentMethod } = data;
+      const { user, trip, seats, paymentMethod } = data;
 
-      if (!user || !trip || !bus || !seats || seats.length === 0) {
+      if (!user || !trip || !seats || seats.length === 0) {
         throw { status: 400, message: "Missing required fields" };
       }
 
@@ -45,7 +45,6 @@ class OrderService {
       const order = await OrderModel.create({
         user,
         trip,
-        bus,
         seats,
         totalAmount,
         paymentMethod,
@@ -55,7 +54,7 @@ class OrderService {
       const populatedOrder = await OrderModel.findById(order._id)
         .populate("user", "name email phone image")
         .populate("trip", "from to date departureTime arrivalTime")
-        .populate("bus", "name busNumber");
+        // .populate("bus", "name busNumber");
 
       return populatedOrder;
 

@@ -12,7 +12,9 @@ const UserRegistry = () => {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const response = await authSvc.getRequest("/auth/getuser");
+        const response = await authSvc.getRequest("/auth/user");
+        console.log(response);
+        
         // Mapping MongoDB _id to Ant Design key
         const usersWithKeys = response.data.Users.map((u: any) => ({
           ...u,
@@ -37,6 +39,16 @@ const UserRegistry = () => {
   }, []);
 
   const columns = [
+    {
+      title: 'Photo',
+      dataIndex: 'image',
+      key: 'image',
+      render: (text: any) => (
+        <div className="flex flex-col">
+         <img src={text.secureUrl} alt="" className='h-10 w-10 rounded-full' />
+        </div>
+      ),
+    },
     {
       title: 'Name',
       dataIndex: 'name',

@@ -26,7 +26,7 @@ const Dashboard = () => {
         setLoading(true);
 
         const [statsRes, busRes] = await Promise.all([
-          authSvc.getRequest("/auth/getuser"),
+          authSvc.getRequest("/auth/user"),
           authSvc.getRequest("/bus"),
         ]);
 

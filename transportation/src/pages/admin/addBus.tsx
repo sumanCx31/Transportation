@@ -16,6 +16,7 @@ interface IFormInputs {
   totalSeats: number;
   phone: string;
   image: File | null;
+  driverId:string;
 }
 
 const AddBus: React.FC = () => {
@@ -30,6 +31,7 @@ const AddBus: React.FC = () => {
       busNumber: "",
       busType: "",
       isActive: "active",
+      driverId:"69b3e1981b2b62c1fff48fc7",
       driverName: "",
       totalSeats: 30,
       image: null,
@@ -106,6 +108,16 @@ const onSubmit: SubmitHandler<IFormInputs> = async (data) => {
                 <TextInput
                   control={control}
                   name={"driverName"}
+                  errMsg={errors?.name?.message as string}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-1.5 ml-1">
+                  DriverId
+                </label>
+                <TextInput
+                  control={control}
+                  name={"driverId"}
                   errMsg={errors?.name?.message as string}
                 />
               </div>

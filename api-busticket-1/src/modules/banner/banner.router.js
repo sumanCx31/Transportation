@@ -9,7 +9,7 @@ const { CreateBannerDTO } = require('./banner.validator');
 
 const bannerRouter = require('express').Router();
 
-bannerRouter.post("/",auth(),uploader().single("image"),bodyValidator(CreateBannerDTO), bannerCtrl.createBanner);
+bannerRouter.post("/",uploader().single("image"),bodyValidator(CreateBannerDTO), bannerCtrl.createBanner);
 bannerRouter.get("/", bannerCtrl.getAllBanner);
 bannerRouter.get('/:id', bannerCtrl.getBannerById);
 bannerRouter.put('/:id',uploader().single('image'), bodyValidator(CreateBannerDTO), bannerCtrl.updateBanner)
