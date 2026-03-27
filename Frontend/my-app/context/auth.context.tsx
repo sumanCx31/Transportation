@@ -56,7 +56,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
 
         const res = await authSvc.getRequest("/auth/me");
-
+        
+        
         setLoggedInUserProfile(res.data);
       } catch (error) {
         console.error("Failed to fetch user:", error);

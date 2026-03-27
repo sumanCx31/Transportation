@@ -1,8 +1,11 @@
 import React from "react";
 import "./globals.css";
+import { Toaster } from "sonner";
+import { AuthProvider } from "@/context/auth.context";
 export default function RootLayout({children}: Readonly<{children: React.ReactNode}>) {
   return (
-    <html lang="en">
+   <AuthProvider>
+     <html lang="en">
       <body
         className={`antialiased bg-slate-900 text-white`}
       >
@@ -35,9 +38,13 @@ export default function RootLayout({children}: Readonly<{children: React.ReactNo
 
         {/* Login Form here */}
         {children}
+        <Toaster position="top-right" richColors />
+
       </div>
     </div>
       </body>
     </html>
+   </AuthProvider>
+
   );
 } 

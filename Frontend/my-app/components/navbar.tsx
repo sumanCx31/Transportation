@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Ticket, Search, CarFront, LogOut, User } from "lucide-react";
 import Button from "./button";
 import logo from "../public/logo.png";
-import { useAuth } from "../context/auth.context"; // Import your auth hook
-import { log } from "console";
+import { useAuth } from "@/context/auth.context";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -18,21 +20,21 @@ const navLinks = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
   
-  // 1. Get user data from context
-  const { loggedInUser } = useAuth();
-  console.log(loggedInUser);
-  
+  const pathname = usePathname();
+ const {loggedInUser} = useAuth();
+ console.log("Response:",loggedInUser?.email);
+ 
+// console.log(loggedInUser);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    setMounted(true);
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 2. Simple Logout Handler
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = "/";
@@ -40,138 +42,161 @@ export default function Navbar() {
 
   return (
     <nav 
-      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 border-b
+      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 border-b mb-5 shadow-2xs shadow-slate-400 active:scale-95
       ${scrolled 
-        ? "bg-white/95 backdrop-blur-md border-slate-200 shadow-sm h-16" 
-        : "bg-white border-transparent h-20"
+        ? "bg-slate-900/80 backdrop-blur-xl border-white shadow-lg shadow-slate-900/5 h-16" 
+        : "bg-slate-800 border-transparent h-20"
       }`}
     >
-      <div className="container mx-auto px-4 md:px-6 h-full">
+      <div className="container mx-auto px-4 md:px-6 h-full shadow-2xs shadow-slate-400 active:scale-95">
         <div className="flex h-full items-center justify-between">
           
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-90">
-            <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center overflow-hidden shadow-lg shadow-emerald-200">
-              <img src={logo.src} alt="SuvYatra Logo" className="h-full w-full object-cover" />
+          {/* Logo Section */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="relative w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center overflow-hidden shadow-emerald-200 shadow-2xs group-hover:scale-105 transition-transform">
+              <Image 
+                src={logo} 
+                alt="Logo" 
+                fill 
+                className="object-cover p-1.5"
+              />
             </div>
-            <span className="text-xl font-black tracking-tighter text-slate-900">
-              Suv<span className="text-emerald-500">Yatra</span>
-            </span>
+            <div className="flex flex-col">
+              <span className="text-xl font-black tracking-tight text-white leading-none">
+                Suv<span className="text-emerald-500">Yatra</span>
+              </span>
+              <span className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em] mt-1">Smart Travel</span>
+            </div>
           </Link>
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="group relative px-4 py-2 text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors"
-              >
-                <span className="flex items-center gap-2">
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex items-center gap-1 bg-slate-50/50 p-1 rounded-full border border-slate-100">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`px-5 py-2 text-sm font-bold rounded-full transition-all duration-300 flex items-center gap-2
+                    ${isActive 
+                      ? "bg-white text-emerald-600 shadow-sm ring-1 ring-slate-200" 
+                      : "text-slate-800 hover:text-emerald-500 hover:bg-white/50"
+                    }`}
+                >
                   {link.icon && <link.icon className="w-4 h-4" />}
                   {link.name}
-                </span>
-                <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-emerald-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
 
-          {/* Desktop Actions - CONDITIONAL RENDERING */}
+          {/* Desktop Actions Section */}
           <div className="hidden md:flex items-center gap-4">
-            {loggedInUser ? (
-              /* User is Logged In */
-              <div className="flex items-center gap-4 pl-4 border-l border-slate-200">
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Welcome</p>
+            {!mounted ? (
+              <div className="w-32 h-10 bg-slate-100 animate-pulse rounded-full" /> 
+            ) : loggedInUser ? (
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 pr-4 border-r border-slate-200">
+                  <div className="text-right hidden lg:block">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Logged in as</p>
                     <p className="text-sm font-black text-slate-900">{loggedInUser.name}</p>
                   </div>
-                  <div className="w-10 h-10 rounded-full border-2 border-emerald-500 p-0.5 shadow-md">
+                  <div className="w-10 h-10 rounded-full border-2 border-emerald-500 p-0.5 shadow-md bg-slate-50 overflow-hidden">
                     <img 
                       src={loggedInUser.image?.secureUrl || "/default-avatar.png"} 
-                      alt="Profile" 
+                      alt="User" 
                       className="w-full h-full rounded-full object-cover"
                     />
                   </div>
                 </div>
                 <button 
                   onClick={handleLogout}
-                  className="p-2 text-slate-400 hover:text-red-500 transition-colors"
-                  title="Logout"
+                  className="group flex items-center gap-2 text-slate-400 hover:text-red-500 font-bold text-sm transition-colors"
                 >
-                  <LogOut size={20} />
+                  <div className="p-2 rounded-lg group-hover:bg-red-50">
+                    <LogOut size={18} />
+                  </div>
+                  Logout
                 </button>
               </div>
             ) : (
-              /* User is NOT Logged In */
-              <>
-                <Link href="http://localhost:5173/" className="text-sm font-bold text-slate-600 hover:text-emerald-500 transition">
+              <div className="flex items-center gap-3">
+                <Link href="/login" className="text-sm font-bold text-slate-300 hover:text-emerald-600 px-4">
                   Login
                 </Link>
-                <Button className="rounded-full px-8 bg-slate-900 text-white hover:bg-emerald-600 transition-all shadow-md shadow-slate-200">
-                  Sign Up
+                <Button className="rounded-full px-7 bg-slate-900 text-white hover:bg-emerald-600 transition-all shadow-2xs shadow-slate-400 active:scale-95">
+                  Sign Up Free
                 </Button>
-              </>
+              </div>
             )}
           </div>
 
           {/* Mobile Toggle */}
           <button 
             onClick={() => setIsOpen(!isOpen)} 
-            className="md:hidden p-2 rounded-xl bg-slate-50 text-slate-900 border border-slate-100"
+            className="md:hidden p-2.5 rounded-xl bg-slate-50 text-slate-900 border border-slate-200 active:scale-90 transition-transform"
           >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Dropdown */}
-      {isOpen && (
-        <div className="md:hidden absolute w-full bg-white border-b border-slate-200 p-6 space-y-4 shadow-2xl animate-in slide-in-from-top-5">
-          {/* Show User Info in Mobile Menu if logged in */}
-          {loggedInUser && (
-            <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-4">
-               <img 
-                src={loggedInUser.image?.secureUrl || "/default-avatar.png"} 
-                className="w-12 h-12 rounded-full object-cover border-2 border-emerald-500" 
-                alt="Profile"
-              />
-              <div>
-                <p className="text-lg font-black text-slate-900 leading-none">{loggedInUser.name}</p>
-                <p className="text-xs font-bold text-emerald-600 uppercase tracking-tighter mt-1">Active User</p>
-              </div>
-            </div>
-          )}
-
-          {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
-              href={link.href} 
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-4 px-4 py-3 text-lg font-bold text-slate-700 hover:bg-slate-50 rounded-2xl transition"
-            >
-               {link.icon && <link.icon className="w-5 h-5 text-emerald-500" />}
-               {link.name}
-            </Link>
-          ))}
-
-          <div className="pt-4 border-t border-slate-100">
-            {loggedInUser ? (
-               <button 
-                onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-red-50 text-red-600 font-bold"
-               >
-                 <LogOut size={20} /> Logout
-               </button>
-            ) : (
-              <div className="grid grid-cols-2 gap-4">
-                <Button className="rounded-2xl border-slate-200 py-4 font-bold">Login</Button>
-                <Button className="rounded-2xl bg-emerald-500 text-white py-4 font-bold shadow-lg shadow-emerald-100">Sign Up</Button>
+      {/* Mobile Dropdown with Framer Motion */}
+      <AnimatePresence>
+        {isOpen && mounted && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="md:hidden absolute w-full bg-white border-b border-slate-200 p-6 space-y-4 shadow-2xl backdrop-blur-3xl"
+          >
+            {loggedInUser && (
+              <div className="flex items-center gap-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                 <img 
+                  src={loggedInUser.image?.secureUrl || "/default-avatar.png"} 
+                  className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm" 
+                  alt="Profile"
+                />
+                <div>
+                  <p className="text-lg font-black text-slate-900 leading-none">{loggedInUser.name}</p>
+                  <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mt-1.5">Premium Passenger</p>
+                </div>
               </div>
             )}
-          </div>
-        </div>
-      )}
+
+            <div className="grid gap-2">
+              {navLinks.map((link) => (
+                <Link 
+                  key={link.name} 
+                  href={link.href} 
+                  onClick={() => setIsOpen(false)}
+                  className={`flex items-center gap-4 px-5 py-4 text-base font-bold rounded-2xl transition-all
+                    ${pathname === link.href ? "bg-emerald-600 text-white" : "hover:bg-slate-50 text-slate-700"}`}
+                >
+                   {link.icon && <link.icon className={pathname === link.href ? "w-5 h-5 text-white" : "w-5 h-5 text-emerald-500"} />}
+                   {link.name}
+                </Link>
+              ))}
+            </div>
+
+            <div className="pt-4 border-t border-slate-100">
+              {loggedInUser ? (
+                 <button 
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-red-50 text-red-600 font-black"
+                 >
+                   <LogOut size={20} /> Sign Out Account
+                 </button>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <Button variant="outline" className="w-full rounded-2xl py-4 font-black border-slate-200">Login</Button>
+                  <Button className="w-full rounded-2xl bg-emerald-600 text-white py-4 font-black shadow-lg shadow-emerald-100">Create Account</Button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

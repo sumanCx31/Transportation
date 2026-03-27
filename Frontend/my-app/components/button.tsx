@@ -16,10 +16,10 @@ const Button = ({
     "inline-flex items-center justify-center rounded-lg font-medium transition focus:outline-none focus:ring-2";
 
   const variants = {
-    primary: "bg-primary text-white hover:bg-primary/90",
-    accent: "bg-accent text-accent-foreground hover:bg-accent/90",
-    outline: "border border-border hover:bg-muted",
-    ghost: "hover:bg-muted",
+    primary: "bg-emerald-600 text-white hover:bg-emerald-700",
+    accent: "bg-slate-900 text-white hover:bg-slate-800",
+    outline: "border border-slate-200 hover:bg-slate-50",
+    ghost: "hover:bg-slate-100",
   };
 
   const sizes = {
@@ -29,6 +29,7 @@ const Button = ({
 
   return (
     <button
+      suppressHydrationWarning={true} // Fixed: Prevents extension-based hydration errors
       className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >

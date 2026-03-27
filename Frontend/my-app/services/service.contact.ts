@@ -1,8 +1,8 @@
+import { AxiosRequestConfig } from "axios";
+
 export interface IConfigParams {
-    header?: {
-        [key: string] : unknown;
-    };
-    params?: {
-        [key: string]: unknown;
-    };
+  headers?: AxiosRequestConfig["headers"];
+  params?: {
+    [key: string]: unknown;
+  };
 }

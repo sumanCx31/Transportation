@@ -56,7 +56,7 @@ const ProfessionalSearch = () => {
       const busList = response.data?.data || response.data || [];
 
       if (busList.length === 0) {
-        toast.error("No buses found for this route or date");
+        toast.error("No Bus found on this date or route!!");
         return;
       }
 
@@ -74,10 +74,10 @@ const ProfessionalSearch = () => {
       );
       
     } catch (error: any) {
-      console.error("Search failed:", error);
+      // console.error("Search failed:", error);
       // Backend returns { status: 404, message: "Not found trip..." }
-      const errorMsg = error.response?.data?.message || "No trips available for this selection.";
-      toast.error(errorMsg);
+      // const errorMsg = error.response?.data?.message || "No trips available for this selection.";
+      toast.error("Sorry, No trips available for this selection.");
     } finally {
       setLoading(false);
     }

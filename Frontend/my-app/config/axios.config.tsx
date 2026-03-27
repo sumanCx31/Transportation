@@ -15,12 +15,15 @@ export const axiosInstance = axios.create({
 
 // OPTIONAL: token only for protected routes
 axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("accessToken");
   if (token) {
     config.headers = config.headers || {};
     config.headers.Authorization = `Bearer ${token}`;
   }
+  console.log(config);
+  
   return config;
+
 });
 
 

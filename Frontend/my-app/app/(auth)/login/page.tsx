@@ -4,7 +4,10 @@ import React from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { EmailInput, PasswordInput } from "../../../components/formInput/formInput";
+import {
+  EmailInput,
+  PasswordInput,
+} from "../../../components/formInput/formInput";
 import authSvc from "../../../services/auth.service";
 import { toast } from "sonner";
 import { useAuth } from "../../../context/auth.context";
@@ -33,37 +36,40 @@ const LoginForm: React.FC = () => {
     try {
       // 1. Initial Login Request
       const response = await authSvc.postRequest("/auth/login", data);
+      console.log("response:", response);
 
       if (response?.data) {
         const token = response.data.accessToken;
-        
+
         // 2. Immediate Persistence
         localStorage.setItem("accessToken", token);
         localStorage.setItem("refreshToken", response.data.refreshToken);
 
         // 3. Fetch User Profile (Passing token manually to prevent 401 race condition)
         const userRes = await authSvc.getRequest("/auth/me", {
-          header: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         
-        // 4. Update Global Context
-        setLoggedInUserProfile(userRes.data);
+        
 
-        toast.success(`Welcome back, ${userRes.data.name || 'User'}!`, {
-          position: "top-right",
-          style: { background: "#10b981", color: "white" },
-        });
+        localStorage.setItem("user", JSON.stringify(userRes.data));
+        setLoggedInUserProfile(userRes.data);
 
         // 5. Navigate to Home
         setTimeout(() => {
+          toast.success(`Welcome back, ${userRes.data.name || "User"}!`, {
+            position: "top-right",
+            style: { background: "#10b981", color: "white" },
+          });
           router.push("/");
         }, 500);
       }
     } catch (error: any) {
       console.error("Login sequence failed:", error);
-      const errorMessage = error.response?.data?.message || "Invalid email or password";
+      const errorMessage =
+        error.response?.data?.message || "Invalid email or password";
       toast.error(errorMessage);
     }
   };
@@ -71,10 +77,13 @@ const LoginForm: React.FC = () => {
   return (
     <div className="flex justify-center lg:justify-end">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2.5rem] p-10 shadow-2xl animate-in fade-in slide-in-from-bottom-5">
-        
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-white tracking-tight">Welcome Back</h2>
-          <p className="text-slate-400 mt-2">Sign in to manage your SuvYatra fleet</p>
+          <h2 className="text-3xl font-bold text-white tracking-tight">
+            Welcome Back
+          </h2>
+          <p className="text-slate-400 mt-2">
+            Sign in to manage your SuvYatra fleet
+          </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -85,7 +94,9 @@ const LoginForm: React.FC = () => {
             </label>
             <EmailInput control={control} name="email" />
             {errors.email && (
-              <p className="text-red-400 text-xs mt-1 ml-1">{errors.email.message}</p>
+              <p className="text-red-400 text-xs mt-1 ml-1">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
@@ -96,7 +107,9 @@ const LoginForm: React.FC = () => {
             </label>
             <PasswordInput control={control} name="password" />
             {errors.password && (
-              <p className="text-red-400 text-xs mt-1 ml-1">{errors.password.message}</p>
+              <p className="text-red-400 text-xs mt-1 ml-1">
+                {errors.password.message}
+              </p>
             )}
           </div>
 
@@ -109,7 +122,10 @@ const LoginForm: React.FC = () => {
               />
               Remember me
             </label>
-            <a href="#" className="text-emerald-400 hover:text-emerald-300 font-medium transition">
+            <a
+              href="#"
+              className="text-emerald-400 hover:text-emerald-300 font-medium transition"
+            >
               Forgot Password?
             </a>
           </div>

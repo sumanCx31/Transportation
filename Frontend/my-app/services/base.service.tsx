@@ -1,8 +1,9 @@
-import { type IConfigParams } from "@/services/service.contact";
+
 import { axiosInstance } from "@/config/axios.config";
+import { IConfigParams } from "./service.contact";
 
 abstract class BaseService {
-  async getRequest(url: string, config: IConfigParams = {}) {
+  async getRequest(url: string, config: IConfigParams={}) {
     return await axiosInstance.get(url, config);
   }
   async postRequest(url: string, data: any = null, config: IConfigParams = {}) {
