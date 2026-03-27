@@ -42,7 +42,7 @@ export default function Navbar() {
 
   return (
     <nav 
-      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 border-b mb-5 shadow-2xs shadow-slate-400 active:scale-95
+      className={`fixed top-0 left-0 right-0 z-100 transition-all duration-500 border-b mb-5 shadow-2xs shadow-slate-400 active:scale-95
       ${scrolled 
         ? "bg-slate-900/80 backdrop-blur-xl border-white shadow-lg shadow-slate-900/5 h-16" 
         : "bg-slate-800 border-transparent h-20"
@@ -98,8 +98,8 @@ export default function Navbar() {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-3 pr-4 border-r border-slate-200">
                   <div className="text-right hidden lg:block">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Logged in as</p>
-                    <p className="text-sm font-black text-slate-900">{loggedInUser.name}</p>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Logged in as</p>
+                    <p className="text-sm font-black text-slate-300">{loggedInUser.name}</p>
                   </div>
                   <div className="w-10 h-10 rounded-full border-2 border-emerald-500 p-0.5 shadow-md bg-slate-50 overflow-hidden">
                     <img 

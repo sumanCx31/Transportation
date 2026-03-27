@@ -57,7 +57,7 @@ const BusCard = ({ bus }: any) => {
         />
 
         {/* GRADIENT OVERLAY */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/70 to-transparent" />
 
         {/* BUS TYPE BADGE */}
         <span className="absolute top-3 left-3 bg-white/90 text-xs font-semibold px-3 py-1 rounded-full shadow">
@@ -120,7 +120,7 @@ const BusCard = ({ bus }: any) => {
           className={`w-full mt-5 py-2 rounded-xl font-semibold transition-all duration-300 ${
             isFull
               ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-              : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:opacity-90 shadow-md"
+              : "bg-linear-to-r from-blue-600 to-indigo-600 text-white hover:opacity-90 shadow-md"
           }`}
         >
           {isFull ? "Unavailable" : "View Seats"}
@@ -132,7 +132,7 @@ const BusCard = ({ bus }: any) => {
 
 export default function BusSearchPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200 p-6 mt-20">
+    <div className="min-h-screen bg-linear-to-br from-slate-100 via-white to-slate-200 p-6 mt-20">
       {/* HEADER */}
       <motion.h1
         initial={{ opacity: 0, y: -10 }}

@@ -137,7 +137,7 @@ const ProfessionalSearch = () => {
             name="date"
             value={formData.date}
             onChange={handleChange}
-            className="w-full bg-transparent border-none outline-none text-white text-lg [color-scheme:dark] cursor-pointer focus:ring-0"
+            className="w-full bg-transparent border-none outline-none text-white text-lg scheme-dark cursor-pointer focus:ring-0"
           />
         </div>
 

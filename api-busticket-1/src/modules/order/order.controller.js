@@ -187,27 +187,40 @@ initiatePayment = async (req, res) => {
 };
 
   // 🔹 Get My Tickets
-  getMyTickets = async (req, res) => {
-    try {
-      const userId = req.authUser._id;
+ getMyTickets = async (req, res) => {
+  try {
+    const pidx = req.params._id;
 
-      const tickets = await OrderModel.find({
-        user: userId, // ✅ FIXED (you had userId before ❌)
-        paymentStatus: "paid",
+const orderDetail = await OrderModel.find({ pidx })
+      .select("trip user seats") // only required fields from Order
+      .populate({
+        path: "trip",
+        select: "from to date seats", // only trip name
       })
-        .populate("trip")
-        .sort({ createdAt: -1 });
+      .populate({
+        path: "user",
+        select: "name", // only user name
+      });
 
-      res.json({
-        data: tickets,
-        message: "Tickets retrieved successfully",
-      });
-    } catch (err) {
-      res.status(500).json({
-        message: err.message,
-      });
-    }
-  };
+    // Optional: format response (clean structure)
+    const formatted = orderDetail.map((order) => ({
+      from: order.trip?.from,
+      to: order.trip?.to,
+      userName: order.user?.name,
+      seats: order?.seats,
+      date: order.trip?.date,
+    }));
+
+    res.json({
+      data: formatted,
+      message: "Tickets retrieved successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};
 }
 
 module.exports = new OrderController();

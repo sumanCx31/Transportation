@@ -10,5 +10,5 @@ OrderRouter.post("/payment/verify", orderCltr.verifyPayment);
 
 OrderRouter.post("/payment/:orderId",orderCltr.initiatePayment);
 
-OrderRouter.get("/my-tickets",orderCltr.getMyTickets)
+OrderRouter.get("/my-tickets/:_id",orderCltr.getMyTickets)
 module.exports = OrderRouter;

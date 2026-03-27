@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Armchair, ShipWheel, CheckCircle2, ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
+import { useAuth } from "@/context/auth.context";
 
 interface PageSeatProps {
   initialData: {
@@ -26,6 +27,7 @@ interface PageSeatProps {
 }
 
 const PageSeat: React.FC<PageSeatProps> = ({ initialData }) => {
+  const {loggedInUser} = useAuth();
   const router = useRouter();
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -45,7 +47,7 @@ const PageSeat: React.FC<PageSeatProps> = ({ initialData }) => {
        * Route: POST http://localhost:9005/api/v1/order
        */
       const payload = {
-        user: "69b3e1981b2b62c1fff48fc7", // Replace with real User ID from your Auth Store
+        user: loggedInUser?._id, // Replace with real User ID from your Auth Store
         trip: initialData._id,
         seats: selectedSeats,
         paymentMethod: "khalti",
@@ -125,7 +127,7 @@ const PageSeat: React.FC<PageSeatProps> = ({ initialData }) => {
     <div className="flex flex-col lg:flex-row pt-24 pb-12 bg-[#F8FAFC] p-4 md:px-10 gap-8 justify-center items-start">
       
       {/* BUS LAYOUT VISUALIZER */}
-      <div className="w-full max-w-[420px] bg-white rounded-[40px] shadow-2xl border-[12px] border-slate-50 overflow-hidden">
+      <div className="w-full max-w-105 bg-white rounded-[40px] shadow-2xl border-12 border-slate-50 overflow-hidden">
         <div className="bg-slate-50 p-6 border-b border-dashed border-slate-200">
           <button
             onClick={() => router.back()}
@@ -173,7 +175,7 @@ const PageSeat: React.FC<PageSeatProps> = ({ initialData }) => {
       </div>
 
       {/* TICKET SUMMARY SIDEBAR */}
-      <div className="w-full max-w-[400px] sticky top-28">
+      <div className="w-full max-w-100 sticky top-28">
         <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-100">
           <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter">
             SUV <span className="text-emerald-500 font-medium italic">Yatra</span>

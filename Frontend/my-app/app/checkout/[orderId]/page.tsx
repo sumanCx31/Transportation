@@ -143,7 +143,7 @@ export default function CheckoutPage({ params, searchParams }: any) {
               <button 
                 onClick={handlePayment}
                 disabled={isPaying}
-                className="w-full h-20 bg-[#5C2D91] hover:bg-[#4c247d] text-white rounded-[1.5rem] font-black text-xl shadow-xl shadow-purple-100 transition-all flex items-center justify-center gap-4 group disabled:opacity-70"
+                className="w-full h-20 bg-[#5C2D91] hover:bg-[#4c247d] text-white rounded-3xl font-black text-xl shadow-xl shadow-purple-100 transition-all flex items-center justify-center gap-4 group disabled:opacity-70"
               >
                 {isPaying ? (
                   <Loader2 className="animate-spin" />
