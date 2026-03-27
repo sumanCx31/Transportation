@@ -1,15 +1,18 @@
-const { default: axios } = require("axios");
-const mongoose = require("mongoose"); // ✅ Added this to fix ReferenceError
-const OrderModel = require("./order.model");
-const orderSvc = require("./order.service");
-const { createOrderValidator } = require("./order.validator");
-const { AppConfig, PaymentConfig } = require("../../config/config");
-const TripModel = require("../tripUpdation/tripUpdate.model");
+const axios = require("axios");
+const mongoose = require("mongoose");
 
-class orderController {
+const OrderModel = require("./order.model");
+const TripModel = require("../tripUpdation/tripUpdate.model");
+const orderSvc = require("./order.service");
+
+const { PaymentConfig, AppConfig } = require("../../config/config");
+
+class OrderController {
+  // 🔹 Create Order (already working, kept clean)
   createOrder = async (req, res) => {
     try {
       const data = req.body;
+
       const order = await orderSvc.create(data);
 
       res.status(201).json({
@@ -18,147 +21,193 @@ class orderController {
       });
     } catch (err) {
       console.error(err);
+      res.status(err.status || 500).json({
+        message: err.message || "Server error",
+      });
+    }
+  };
+
+  // 🔹 Get Single Order
+  getSingleOrder = async (req, res) => {
+    try {
+      const _id = req.params.id;
+
+      if (!mongoose.Types.ObjectId.isValid(_id)) {
+        return res.status(400).json({
+          message: "Invalid order ID",
+        });
+      }
+
+      const order = await OrderModel.findById(_id);
+
+      if (!order) {
+        return res.status(404).json({
+          message: "Order not found",
+        });
+      }
+
+      res.status(200).json({
+        data: order,
+      });
+    } catch (error) {
       res.status(500).json({
         message: "Server error",
       });
     }
   };
 
-getSingleOrder = async (req, res) => {
-  const _id=req.params.id;
-    const order = await OrderModel.findOne({_id});
-    if (!order) return res.status(404).json({ message: "Order not found" });
-    res.status(200).json({ data: order });
+  // 🔹 INITIATE PAYMENT
+ // 🔹 INITIATE PAYMENT
+initiatePayment = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+
+    // 1. Find the order
+    const order = await OrderModel.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // 2. Call Khalti initiate API
+    const response = await fetch(PaymentConfig.khalti.url + "epayment/initiate/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Key ${PaymentConfig.khalti.secretKey}`,
+      },
+      body: JSON.stringify({
+        return_url: `${AppConfig.frontendUrl}/payment-success`, // frontend success page
+        website_url: AppConfig.frontendUrl,
+        amount: order.totalAmount * 100, // Khalti expects paisa
+        purchase_order_id: order._id.toString(),
+        purchase_order_name: "Bus Ticket Booking",
+      }),
+    });
+
+    const data = await response.json();
+
+    // 3. Save pidx in order document
+    if (data.pidx) {
+      order.pidx = data.pidx;
+      order.paymentMethod = "khalti";
+      await order.save(); // ✅ saves pidx in DB
+    } else {
+      return res.status(500).json({ message: "Payment initiation failed" });
+    }
+
+    // 4. Return the payment URL to frontend
+    res.json({
+      status: "PAYMENT_INITIATE",
+      message: "Payment initiated",
+      data: {
+        pidx: data.pidx,
+        payment_url: `https://test-pay.khalti.com/?pidx=${data.pidx}`,
+      },
+    });
+  } catch (error) {
+    console.error("Payment Initiation Error:", error);
+    res.status(500).json({ message: "Payment initiation failed" });
+  }
 };
 
-  initiatePayment = async (req, res) => {
-    try {
-      const _id = req.params.orderId;
-      const orderDetail = await orderSvc.getSingleRowByFilter(_id);
+  // 🔹 VERIFY PAYMENT (FINAL SAFE VERSION)
+ verifyPayment = async (req, res) => {
+  try {
+    const { pidx } = req.body;
 
-      if (!orderDetail || orderDetail.length === 0) {
-        return res.status(422).json({
-          message: "Order Not Found!!",
-          status: "ORDER_NOT_FOUND",
-        });
-      }
+    // if (!pidx) {
+    //   return res.status(400).json({ message: "pidx is required" });
+    // }
 
-      const response = await fetch(
-        PaymentConfig.khalti.url + "epayment/initiate/",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            return_url: AppConfig.frontendUrl + "/payment/verify",
-            website_url: AppConfig.frontendUrl,
-            amount: orderDetail[0].totalAmount * 100,
-            purchase_order_id: orderDetail[0]._id.toString(),
-            purchase_order_name: "E-Payment Purchase",
-          }),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Key " + PaymentConfig.khalti.secretKey,
-          },
-        },
-      );
+    // 1️⃣ Find the order by pidx
+    const order = await OrderModel.findOne({ pidx });
 
-      res.json({
-        data: await response.json(),
-        message: "Payment Initiate",
-        status: "PAYMENT_INITIATE",
-        option: null,
-      });
-    } catch (exception) {
-      res.status(500).json({ message: exception.message });
+    if (!order) {
+      return res.status(404).json({ message: "Order not found for this payment" });
     }
-  };
 
-  verifyPayment = async (req, res) => {
-    try {
-      const { pidx, purchase_order_id } = req.body;
-
-      // 1. Khalti Lookup
-      const response = await fetch(
-        `${PaymentConfig.khalti.url}epayment/lookup/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Key ${PaymentConfig.khalti.secretKey}`,
-          },
-          body: JSON.stringify({ pidx }),
-        },
-      );
-
-      const khaltiData = await response.json();
-
-      if (khaltiData.status === "Completed") {
-        const updatedOrder = await OrderModel.findByIdAndUpdate(
-          purchase_order_id,
-          {
-            paymentStatus: "paid",
-            transactionId: khaltiData.transaction_id,
-            status: "confirmed",
-          },
-          { returnDocument: "after" },
-        );
-
-        if (!updatedOrder) {
-          return res.status(404).json({ message: "Order not found." });
-        }
-
-        const tripUpdate = await TripModel.updateOne(
-          { _id: new mongoose.Types.ObjectId(updatedOrder.trip) },
-          {
-            $set: {
-              "seats.$[elem].isBooked": true,
-              "seats.$[elem].reservedBy": updatedOrder.user,
-              "seats.$[elem].reservedAt": new Date(),
-            },
-          },
-          {
-            arrayFilters: [{ "elem.seatNumber": { $in: updatedOrder.seats } }],
-          },
-        );
-
-        return res.json({
-          data: khaltiData,
-          message: "Payment verified and seats officially booked.",
-          status: "PAYMENT_SUCCESS",
-        });
-      } else {
-        return res.status(400).json({
-          data: khaltiData,
-          message: `Payment failed with status: ${khaltiData.status}`,
-          status: "PAYMENT_FAILED",
-        });
-      }
-    } catch (error) {
-      console.error("Payment Verification Error:", error);
-      res
-        .status(500)
-        .json({ message: "Internal Server Error", error: error.message });
+    // 2️⃣ Prevent duplicate verification
+    if (order.paymentStatus === "paid") {
+      return res.status(200).json({ message: "Payment already verified", status: "ALREADY_VERIFIED" });
     }
-  };
 
+    // 3️⃣ Call Khalti lookup API
+    const { data: khaltiData } = await axios.post(
+      `${PaymentConfig.khalti.url}epayment/lookup/`,
+      { pidx },
+      {
+        headers: {
+          Authorization: `Key ${PaymentConfig.khalti.secretKey}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("Khalti Response:", khaltiData);
+
+    // 4️⃣ Validate Khalti response
+    if (!khaltiData || khaltiData.status !== "Completed") {
+      order.paymentStatus = "failed";
+      await order.save();
+      return res.status(400).json({ message: `Payment not completed: ${khaltiData.status || "Unknown"}`, data: khaltiData });
+    }
+
+    if (khaltiData.total_amount !== order.totalAmount * 100) {
+      order.paymentStatus = "failed";
+      await order.save();
+      return res.status(400).json({ message: "Payment amount mismatch", data: khaltiData });
+    }
+
+    // 5️⃣ Update order as paid
+    order.paymentStatus = "paid";
+    order.transactionId = khaltiData.transaction_id;
+    await order.save();
+
+    // 6️⃣ Update trip seats
+    await TripModel.updateOne(
+      { _id: order.trip },
+      {
+        $set: {
+          "seats.$[elem].isBooked": true,
+          "seats.$[elem].reservedBy": order.user,
+          "seats.$[elem].reservedAt": new Date(),
+        },
+      },
+      {
+        arrayFilters: [{ "elem.seatNumber": { $in: order.seats } }],
+      }
+    );
+
+    return res.status(200).json({ message: "Payment verified successfully", status: "SUCCESS" });
+
+  } catch (error) {
+    console.error("Verification Error:", error.response?.data || error.message);
+    res.status(500).json({ message: "Verification failed", error: error.response?.data || error.message });
+  }
+};
+
+  // 🔹 Get My Tickets
   getMyTickets = async (req, res) => {
     try {
       const userId = req.authUser._id;
 
       const tickets = await OrderModel.find({
-        userId: userId,
+        user: userId, // ✅ FIXED (you had userId before ❌)
         paymentStatus: "paid",
-      }).sort({ createdAt: -1 });
+      })
+        .populate("trip")
+        .sort({ createdAt: -1 });
 
       res.json({
         data: tickets,
         message: "Tickets retrieved successfully",
-        status: "SUCCESS",
       });
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      res.status(500).json({
+        message: err.message,
+      });
     }
   };
 }
 
-const orderCltr = new orderController();
-module.exports = orderCltr;
+module.exports = new OrderController();
