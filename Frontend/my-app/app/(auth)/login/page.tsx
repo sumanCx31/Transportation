@@ -67,7 +67,7 @@ const LoginForm: React.FC = () => {
         }, 500);
       }
     } catch (error: any) {
-      console.error("Login sequence failed:", error);
+      // console.error("Login sequence failed:", error);
       const errorMessage =
         error.response?.data?.message || "Invalid email or password";
       toast.error(errorMessage);

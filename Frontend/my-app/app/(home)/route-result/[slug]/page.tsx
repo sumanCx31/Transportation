@@ -60,7 +60,7 @@ export default function ResultsPage({ params }: { params: Promise<{ slug: string
             Active Search
           </span>
           <p className="text-gray-500 font-medium text-sm">
-            Date: <span className="text-slate-900">{date || 'Anytime'}</span> • {buses.length} Fleet(s) Found
+            Date: <span className="text-white">{date || 'Anytime'}</span> • {buses.length} Fleet(s) Found
           </p>
         </div>
       </div>

@@ -90,7 +90,7 @@ export default function Carousel() {
                 <a
                   href={banner.link}
                   target="_blank"
-                  className="mt-6 inline-block w-fit px-8 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
+                  className="mt-6 inline-block w-fit px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
                 >
                   Grab Offer
                 </a>
