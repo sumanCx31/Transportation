@@ -19,6 +19,8 @@ const createOrderValidator = Joi.object({
     .min(1)
     .required(),
 
+  promoCode: Joi.string().optional(),
+
   paymentStatus: Joi.string()
     .valid("pending", "paid", "failed")
     .optional(),

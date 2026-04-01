@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import axiosInstance from "@/config/axios.config";
 import { toast } from "sonner";
 import TicketGenerator from "@/components/ticketGenerator";
-import Button from "@/components/button";
+import Button from "@/components/formInput/button";
 
 
 // Define ticket type

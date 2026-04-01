@@ -14,4 +14,5 @@ bannerRouter.get("/", bannerCtrl.getAllBanner);
 bannerRouter.get('/:id', bannerCtrl.getBannerById);
 bannerRouter.put('/:id',uploader().single('image'), bodyValidator(CreateBannerDTO), bannerCtrl.updateBanner)
 bannerRouter.delete("/:id", bannerCtrl.deleteBannerById);
+
 module.exports = bannerRouter;

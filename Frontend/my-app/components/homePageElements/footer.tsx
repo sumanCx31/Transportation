@@ -26,10 +26,10 @@ export default function Footer() {
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                 <Bus className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold">BusGo</span>
+              <span className="text-xl font-bold">Suv<span className="text-green-500 font-bold text-xl">Yatra</span> </span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              BusGo is a modern online bus transportation platform that makes
+              SuvYatra is a modern online bus transportation platform that makes
               booking, managing, and traveling easier and smarter.
             </p>
           </div>
@@ -40,9 +40,9 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               {[
                 { name: "Home", href: "/" },
-                { name: "Find Buses", href: "/search" },
-                { name: "For Drivers", href: "/drivers" },
-                { name: "My Tickets", href: "/tickets" },
+                { name: "Find Buses", href: "/bus" },
+                { name: "Offers", href: "/offers" },
+                { name: "My Tickets", href: "/my-tickets" },
               ].map((link) => (
                 <li key={link.name}>
                   <Link
@@ -64,7 +64,6 @@ export default function Footer() {
                 "Help Center",
                 "FAQs",
                 "Cancellation Policy",
-                "Privacy Policy",
                 "Terms & Conditions",
               ].map((item) => (
                 <li key={item}>
@@ -85,11 +84,11 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-primary" />
-                support@busgo.com
+                sumansah029@gmail.com
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-primary" />
-                +977 98XXXXXXXX
+                +977 9702790990
               </li>
               <li className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" />
@@ -106,7 +105,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
 
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} BusGo. All rights reserved.
+            © {new Date().getFullYear()} SuvYatra. All rights reserved.
           </p>
 
           {/* Social Icons */}

@@ -5,16 +5,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Ticket, Search, CarFront, LogOut, User } from "lucide-react";
-import Button from "./button";
-import logo from "../public/logo.png";
+import { Menu, X, Ticket, Search, CarFront, LogOut, User, Gift, Info } from "lucide-react";
+import Button from "@/components/formInput/button";
+import logo from "../../public/logo.png";
 import { useAuth } from "@/context/auth.context";
 
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Find Buses", href: "/bus", icon: Search },
-  { name: "For Drivers", href: "/drivers", icon: CarFront },
-  { name: "My Tickets", href: "/tickets", icon: Ticket },
+  { name: "About Us", href: "/about-us", icon: Info },
+  { name: "My Tickets", href: "/my-tickets", icon: Ticket },
 ];
 
 export default function Navbar() {
@@ -24,7 +24,7 @@ export default function Navbar() {
   
   const pathname = usePathname();
  const {loggedInUser} = useAuth();
- console.log("Response:",loggedInUser?.email);
+//  console.log("Response:",loggedInUser?.email);
  
 // console.log(loggedInUser);
 

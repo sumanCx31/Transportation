@@ -3,6 +3,7 @@ const authRouter = require("../modules/auth/auth.router");
 const bannerRouter = require("../modules/banner/banner.router");
 const busRouter = require("../modules/bus/bus.router");
 const ChatRouter = require("../modules/chat/chat.router");
+const OfferRouter = require("../modules/offers/offers.router");
 const OrderRouter = require("../modules/order/order.router");
 const bookingRouter = require("../modules/reservation/booking.route");
 const searchRouter = require("../modules/searchByRoute/search.route");
@@ -27,5 +28,6 @@ router.use("/book-ticket",bookingRouter);
 router.use("/driver-bus",driverRoute);
 router.use("/order",OrderRouter);
 router.use("/chat",ChatRouter);
+router.use("/offers",OfferRouter)
 
 module.exports = router;

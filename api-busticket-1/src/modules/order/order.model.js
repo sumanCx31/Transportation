@@ -30,6 +30,10 @@ const OrderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    promoCode:{
+      type: String,
+      default: null,
+    },
 
     paymentStatus: {
       type: String,

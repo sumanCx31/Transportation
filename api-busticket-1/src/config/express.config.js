@@ -20,11 +20,6 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-    console.log("🚀 DEBUG LOG:", req.method, req.url);
-    console.log("📦 BODY:", req.body); 
-    next();
-});
 
 app.use("/api/v1", router);
 

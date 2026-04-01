@@ -1,7 +1,7 @@
 
-import Carousel from "@/components/crousal";
-import ProfessionalSearch from "@/components/searchBox";
-import TopDestinations from "@/components/topDestination";
+import Carousel from "@/components/homePageElements/banner";
+import ProfessionalSearch from "@/components/homePageElements/searchBox";
+import TopDestinations from "@/components/homePageElements/topDestination";
 
 export default function Home() {
   return (
