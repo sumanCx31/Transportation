@@ -1,5 +1,6 @@
 const { offerSvc } = require("./offers.service");
 
+
 class OfferController {
     createPromo=async (req,res)=>{
         try {
@@ -20,6 +21,19 @@ class OfferController {
         } catch (exception) {
             throw exception;
         }
+    }
+
+    getAllPromoByCode=async (req,res)=>{
+    try {
+        const allPromos = await offerSvc.getAllPromoByCode();
+        res.json({
+            data:allPromos,
+            message:"Promos retrieved successfully!",
+            status:"success"
+        })
+    } catch (exception) {
+        throw exception;
+    }
     }
 }
 

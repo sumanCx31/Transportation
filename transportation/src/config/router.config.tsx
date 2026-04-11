@@ -25,6 +25,13 @@ import ChatPage from "../pages/chat/chat.page";
 import BannerPage from "../pages/admin/banner";
 import AddBanner from "../components/Admin/addBanner";
 import updateBanner from "../components/Admin/updateBannner";
+// import AdminOfferPage from "../pages/admin/addPromo";
+import PromoListPage from "../pages/admin/getAllPromos";
+import AdminOfferPages from "../pages/admin/addPromo";
+import AdminBookingPage from "../pages/admin/bookingPage";
+import DriverBookingPage from "../pages/driver/bookingPage";
+import BookingDetailPage from "../pages/driver/bookingDetailPage";
+// import AdminBookingPage from "../pages/admin/bookingPage";
 
 const routerConfig = createBrowserRouter([
   {
@@ -52,6 +59,9 @@ const routerConfig = createBrowserRouter([
       { path: "banners/add-banner", Component: AddBanner },
       { path: "banners/update/:_id", Component: updateBanner },
       { path: "banners", Component: BannerPage },
+      { path: "booking", Component: AdminBookingPage },
+      {path: "promos", Component: PromoListPage},
+      {path: "promos/add-promo", Component: AdminOfferPages},
       { path: "users", Component: Users },
       { path: "chat", Component: ChatPage },
     ],
@@ -66,6 +76,8 @@ const routerConfig = createBrowserRouter([
       },
       { path: "my-bus", Component: DriverBusPage },
       { path: "trip-update/:busId", Component: DriverTripPage },
+      { path: "booking", Component: DriverBookingPage },
+      { path: "bookings/:_id", Component: BookingDetailPage },
       { path: "add-trip/:busId", Component: CreateTripPage },
       { path: "seat-reservation/:tripId", Component: DriverSeatReservation },
       { path: "chat", Component: ChatPage },

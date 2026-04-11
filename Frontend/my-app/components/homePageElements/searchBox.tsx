@@ -17,6 +17,7 @@ import {
   ChevronRight, 
   TicketPercent 
 } from "lucide-react";
+import { PromoSection } from "./promoSection";
 
 const offers = [
   {
@@ -231,102 +232,9 @@ const [copiedCode, setCopiedCode] = useState<string | null>(null);
         </motion.button>
       </motion.div>
     </div>
-    <div className="bg-[#020617] min-h-screen text-white pt-32 pb-20 px-6">
-      <div className="max-w-6xl mx-auto">
-        
-        {/* --- HEADER --- */}
-        <header className="text-center mb-20 space-y-4">
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-widest"
-          >
-            <Gift size={12} /> Exclusive Rewards
-          </motion.div>
-          <h1 className="text-5xl md:text-7xl font-black italic tracking-tighter">
-            PROMO <span className="text-emerald-500">ZONE.</span>
-          </h1>
-          <p className="text-slate-400 max-w-xl mx-auto font-medium">
-            Exclusive deals for our digital travelers. Use these codes at checkout to unlock premium savings on your next SUV journey.
-          </p>
-        </header>
-
-        {/* --- OFFERS GRID --- */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {offers.map((offer, idx) => (
-            <motion.div
-              key={offer.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1 }}
-              className="relative group bg-[#0F172A] border border-white/5 rounded-[2.5rem] overflow-hidden flex flex-col h-full"
-            >
-              {/* Card Header/Discount Top */}
-              <div className={`h-32 bg-gradient-to-br ${offer.color} p-8 flex items-center justify-between`}>
-                 <div className="bg-black/20 backdrop-blur-md p-3 rounded-2xl">
-                    <TicketPercent size={32} className="text-white" />
-                 </div>
-                 <div className="text-right">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-white/70">{offer.type}</p>
-                    <h2 className="text-3xl font-black text-white italic">{offer.discount}</h2>
-                 </div>
-              </div>
-
-              {/* Card Body */}
-              <div className="p-8 flex-1 flex flex-col">
-                <h3 className="text-xl font-black mb-3 uppercase tracking-tight">{offer.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed mb-6 flex-1">
-                  {offer.description}
-                </p>
-
-                <div className="flex items-center gap-2 text-slate-500 text-[10px] font-bold uppercase mb-4">
-                  <Clock size={12} /> {offer.expiry}
-                </div>
-
-                {/* Promo Code Box */}
-                <button 
-                  onClick={() => copyToClipboard(offer.code)}
-                  className="w-full relative py-4 bg-slate-900 border border-white/5 rounded-2xl flex items-center justify-between px-6 hover:bg-slate-800 transition-all group/btn active:scale-95"
-                >
-                  <div className="flex flex-col items-start">
-                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Promo Code</span>
-                    <span className="text-lg font-black font-mono text-emerald-500 tracking-wider">{offer.code}</span>
-                  </div>
-                  
-                  <AnimatePresence mode="wait">
-                    {copiedCode === offer.code ? (
-                      <motion.div 
-                        initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
-                        className="p-2 bg-emerald-500 rounded-lg text-[#020617]"
-                      >
-                        <CheckCircle2 size={18} />
-                      </motion.div>
-                    ) : (
-                      <div className="p-2 bg-white/5 rounded-lg text-slate-400 group-hover/btn:text-white transition-colors">
-                        <Copy size={18} />
-                      </div>
-                    )}
-                  </AnimatePresence>
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* --- FOOTER CTA --- */}
-        <div className="mt-24 p-12 rounded-[3rem] bg-gradient-to-r from-emerald-600/10 to-transparent border border-emerald-500/20 flex flex-col md:flex-row items-center justify-between gap-8">
-           <div className="space-y-2 text-center md:text-left">
-              <h4 className="text-2xl font-black italic">HAVE A PARTNER CODE?</h4>
-              <p className="text-slate-400 text-sm">Enter it during the checkout process under the "Payment" section.</p>
-           </div>
-           <button 
-            onClick={() => window.location.href = '/bus'}
-            className="px-10 py-5 bg-emerald-500 text-[#020617] rounded-full font-black text-xs uppercase tracking-[0.2em] hover:bg-emerald-400 transition-all shadow-xl shadow-emerald-500/20 flex items-center gap-2"
-           >
-             Book Now <ChevronRight size={16} />
-           </button>
-        </div>
-      </div>
+    
+    <div>
+      <PromoSection />
     </div>
     </>
   );

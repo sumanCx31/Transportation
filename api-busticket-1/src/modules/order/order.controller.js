@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const OrderModel = require("./order.model");
 const TripModel = require("../tripUpdation/tripUpdate.model");
 const orderSvc = require("./order.service");
-
+const BusModel = require("../bus/bus.model");
 const { PaymentConfig, AppConfig } = require("../../config/config");
 const { offerSvc } = require("../offers/offers.service");
 const { string } = require("joi");
@@ -62,6 +62,22 @@ class OrderController {
     }
   };
 
+  getAllOrders = async (req, res) => {
+    try {
+      const orders = await OrderModel.find()
+        .populate("trip", "from to date") // only trip name
+        .populate("user", "name email"); // only user name and email
+
+      res.status(200).json({
+        data: orders,
+        message: "Orders retrieved successfully",
+      });
+    } catch (err) {
+      res.status(500).json({
+        message: err.message,
+      });
+    }
+  };
   // 🔹 Get Single Order
   getSingleOrder = async (req, res) => {
     try {
@@ -73,8 +89,18 @@ class OrderController {
         });
       }
 
-      const order = await OrderModel.findById(_id);
-
+      const order = await OrderModel.findById(_id)
+        .populate("trip", "from to date")
+        .populate("user", "name email");
+      const TripDetails = await TripModel.findById(order.trip._id).populate(
+        "bus",
+        "busNumber name busType",
+      );
+      const busDetails = {
+        busName: TripDetails.bus.name,
+        busNumber: TripDetails.bus.busNumber,
+        busType: TripDetails.bus.busType,
+      }
       if (!order) {
         return res.status(404).json({
           message: "Order not found",
@@ -82,7 +108,15 @@ class OrderController {
       }
 
       res.status(200).json({
-        data: order,
+        data: {
+          order: {
+            ...order._doc,
+            busName: busDetails.busName,
+            busNumber: busDetails.busNumber,
+            busType: busDetails.busType,
+          }
+        },
+        message: "Order retrieved successfully",
       });
     } catch (error) {
       res.status(500).json({
@@ -145,6 +179,132 @@ class OrderController {
     } catch (error) {
       console.error("Payment Initiation Error:", error);
       res.status(500).json({ message: "Payment initiation failed" });
+    }
+  };
+
+  getAllOrdersByDriverId = async (req, res) => {
+    try {
+      const { driverId } = req.params;
+
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const skip = (page - 1) * limit;
+
+      // =========================
+      // 2. Get Driver Buses
+      // =========================
+      const driverBuses = await BusModel.find({ driverId }).select("_id");
+
+      if (!driverBuses.length) {
+        return res.status(200).json({
+          status: true,
+          message: "No buses assigned to this driver",
+          data: [],
+          pagination: { total: 0, page, pages: 0 },
+          totalRevenue: 0,
+          todayRevenue: 0,
+          orderCount: 0,
+        });
+      }
+
+      const busIds = driverBuses.map((b) => b._id);
+
+      const assignedTrips = await TripModel.find({
+        bus: { $in: busIds },
+      }).select("_id");
+
+      if (!assignedTrips.length) {
+        return res.status(200).json({
+          status: true,
+          message: "No trips scheduled for these buses",
+          data: [],
+          pagination: { total: 0, page, pages: 0 },
+          totalRevenue: 0,
+          todayRevenue: 0,
+          orderCount: 0,
+        });
+      }
+
+      const tripIds = assignedTrips.map((t) => t._id);
+
+      const allPaidOrders = await OrderModel.find({
+        trip: { $in: tripIds },
+        paymentStatus: "paid",
+      })
+        .select("totalAmount createdAt trip")
+        .populate({ path: "trip", select: "date" });
+
+      const totalOrdersCount = await OrderModel.countDocuments({
+        trip: { $in: tripIds },
+      });
+
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+      const endOfToday = new Date();
+      endOfToday.setHours(23, 59, 59, 999);
+
+      const totalRevenue = allPaidOrders.reduce(
+        (sum, order) => sum + (Number(order.totalAmount) || 0),
+        0,
+      );
+
+      const todayRevenue = allPaidOrders
+        .filter((order) => {
+          const createdAt = new Date(order.createdAt);
+          return createdAt >= startOfToday && createdAt <= endOfToday;
+        })
+        .reduce((sum, order) => sum + (Number(order.totalAmount) || 0), 0);
+
+      const paginatedOrders = await OrderModel.find({
+        trip: { $in: tripIds },
+      })
+        .populate({
+          path: "trip",
+          select: "-seats",
+          populate: {
+            path: "bus",
+            select: "busNumber name busType",
+          },
+        })
+        .populate("user", "name phone")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+      return res.status(200).json({
+        status: true,
+        message:
+          paginatedOrders.length > 0
+            ? "Data retrieved successfully"
+            : "No orders found",
+
+        totalRevenue,
+        todayRevenue,
+
+        pagination: {
+          totalItems: totalOrdersCount,
+          currentPage: page,
+          totalPages: Math.ceil(totalOrdersCount / limit),
+          limit,
+        },
+
+        data: paginatedOrders.map((order) => ({
+          _id: order._id,
+          trip: order.trip,
+          user: order.user,
+          seats: order.seats,
+          totalAmount: order.totalAmount,
+          paymentStatus: order.paymentStatus,
+          createdAt: order.createdAt,
+        })),
+      });
+    } catch (exception) {
+      console.error("Error in getAllOrdersByDriverId:", exception);
+      return res.status(500).json({
+        status: false,
+        message: "Internal Server Error",
+        error: exception.message,
+      });
     }
   };
 

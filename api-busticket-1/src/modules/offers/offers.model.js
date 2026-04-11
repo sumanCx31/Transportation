@@ -2,6 +2,14 @@ const mongoose = require("mongoose");
 
 const OfferSchema = new mongoose.Schema(
   {
+    title: {
+      type: String,
+      required: false,
+    },
+    description: {
+      type: String,
+      required: false,
+    },
     code: {
       type: String,
       required: true,

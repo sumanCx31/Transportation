@@ -1,165 +1,167 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { LayoutDashboard, Users, Ticket, Bell, Search } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
+import { TrendingUp, Banknote, History, ArrowUpRight, Bus, Users } from "lucide-react";
 import authSvc from "../../services/Auth.service";
-import StatCard from "../../components/layout/card";
 import { useAuth } from "../../context/auth.context";
 
-const DriverDashboard = () => {
-  const [stats, setStats] = useState<any>(null);
-  const [busCount, setBusCount] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
 
-  const { loggedInUser } = useAuth();
+const DriverDashboard = () => {
+  const [stats, setStats] = useState({
+    totalRevenue: 0,
+    todayRevenue: 0,
+    orderCount: 0
+  });
+  const {loggedInUser} = useAuth();
+  
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        const driverId = loggedInUser?._id; 
+        const response: any = await authSvc.getRequest(`/order/my-orders/${driverId}`);
+        
+        // Logic: authSvc usually returns response.data directly or the full Axios object
+        const result = response; 
 
-        const [statsRes, busRes] = await Promise.all([
-          authSvc.getRequest("/auth/getuser"),
-          authSvc.getRequest("/bus"),
-        ]);
-
-        setStats(statsRes.data);
-        setBusCount(busRes.data?.length || 0);
+        if (result && result.status) {
+          setStats({
+            totalRevenue: result.totalRevenue || 0,
+            todayRevenue: result.todayRevenue || 0,
+            orderCount: result.orderCount || 0
+          });
+          setBookings(result.data || []);
+        }
       } catch (err) {
-        console.error("Failed to fetch dashboard data:", err);
+        console.error("Dashboard Sync Error:", err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    window.location.href = "/";
-  };
+  const data = useMemo(() => {
+    return { 
+        lifetime: stats.totalRevenue, 
+        todayRevenue: stats.todayRevenue, 
+        orderCount: stats.orderCount,
+        recent: Array.isArray(bookings) ? bookings.slice(0, 6) : []
+    };
+  }, [bookings, stats]);
 
-  if (loading) {
-    return (
-      <p className="text-slate-500 text-sm p-6 sm:p-10">
-        Synchronizing fleet data...
-      </p>
-    );
-  }
+  if (loading) return (
+    <div className="h-screen bg-slate-950 flex flex-col items-center justify-center text-emerald-500">
+      <div className="size-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
+      <div className="font-black tracking-widest animate-pulse">SYNCING SUVIYATRA...</div>
+    </div>
+  );
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-6">
-      {/* ✅ HEADER */}
-      <header className="flex flex-col lg:flex-row lg:justify-between gap-6 mb-10">
-        {/* LEFT */}
-        <div className="border border-white/10 rounded-3xl px-4 sm:px-6 py-4 w-full">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">
-            Dashboard Overview
+    <div className="p-4 md:p-8 lg:p-12 max-w-[1600px] mx-auto space-y-10 bg-slate-950 min-h-screen text-slate-200">
+      
+      {/* --- HEADER SECTION --- */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/5 pb-8">
+        <div>
+          <h1 className="text-5xl font-black text-white tracking-tighter uppercase italic flex items-center gap-3">
+            Driver <span className="text-emerald-500">Analytics</span>
           </h1>
-          <p className="text-slate-400 text-sm sm:text-base">
-            Welcome back, {loggedInUser?.name}.
+          <p className="text-slate-500 text-sm font-bold uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+            <span className="size-2 bg-emerald-500 rounded-full animate-ping"></span>
+            Live Revenue Stream
           </p>
         </div>
-
-        {/* RIGHT */}
-        <div className="flex flex-col gap-4 w-full lg:w-auto">
-          {/* 🔹 Profile + Logout */}
-          <div className="flex items-center justify-between lg:justify-end gap-4">
-            {/* Profile */}
-            <div className="flex items-center gap-3">
-              <img
-                src={loggedInUser?.image?.secureUrl || "/default-avatar.png"}
-                alt="profile"
-                className="h-10 w-10 rounded-full object-cover border border-white/10"
-              />
-              <span className="text-sm text-white hidden sm:block">
-                {loggedInUser?.name}
-              </span>
+        <div className="bg-slate-900 px-6 py-3 rounded-2xl border border-white/5 flex items-center gap-4">
+            <div className="text-right">
+                <p className="text-[10px] text-slate-500 font-black uppercase">Fleet ID</p>
+                <p className="text-white font-mono font-bold">SUV-DRV-69B3</p>
             </div>
-
-            {/* Logout */}
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-3 py-2 text-sm rounded-xl 
-              bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V7"
-                />
-              </svg>
-              <span className="hidden sm:inline">Logout</span>
-            </button>
-          </div>
-
-          {/* 🔹 Search + Notification */}
-          <div className="flex items-center gap-4 w-full">
-            {/* Search */}
-            <div className="relative flex-1">
-              <Search
-                className="absolute left-3 top-2.5 text-slate-500"
-                size={18}
-              />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 
-                focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
-              />
+            <div className="size-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500">
+                <Bus size={20} />
             </div>
-
-            {/* Notification */}
-            <button className="relative p-2 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10">
-              <Bell size={20} />
-              <span className="absolute top-2 right-2 h-2 w-2 bg-emerald-500 rounded-full" />
-            </button>
-          </div>
         </div>
-      </header>
-
-      {/* ✅ STATS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-10">
-        <StatCard
-          title="Total Revenue"
-          value="12,840"
-          change="+12%"
-          icon={<Ticket />}
-        />
-        <StatCard
-          title="Total Users"
-          value={stats?.TotalUsers || 0}
-          icon={<Users />}
-        />
-        <StatCard
-          title="Tickets Sold"
-          value="1,204"
-          change="+18%"
-          icon={<LayoutDashboard />}
-        />
-        <StatCard
-          title="Total Buses"
-          value={busCount}
-          icon={<LayoutDashboard />}
-        />
       </div>
 
-      {/* ✅ TABLE */}
-      <section className="bg-white/5 border border-white/10 rounded-3xl overflow-x-auto">
-        <div className="p-4 sm:p-6 text-slate-400 text-sm">
-          Table content goes here...
+      {/* --- TOP KPI ROW --- */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Total Revenue Card */}
+        <div className="bg-emerald-600 p-8 rounded-[2rem] text-white shadow-2xl shadow-emerald-900/40 relative overflow-hidden group hover:scale-[1.02] transition-transform">
+            <TrendingUp className="absolute -right-6 -bottom-6 size-40 opacity-10 group-hover:opacity-20 transition-opacity" />
+            <p className="text-xs font-black uppercase opacity-70 tracking-widest">Lifetime Collection</p>
+            <h2 className="text-5xl font-black mt-3 italic">Rs. {data.lifetime.toLocaleString()}</h2>
+            <div className="mt-6 flex items-center gap-2 text-xs font-bold bg-black/20 w-fit px-3 py-1.5 rounded-full">
+                <ArrowUpRight size={14} /> System Verified
+            </div>
         </div>
-      </section>
+
+        {/* Today's Revenue Card */}
+        <div className="bg-slate-900 border border-white/10 p-8 rounded-[2rem] relative overflow-hidden group hover:border-emerald-500/50 transition-colors">
+            <Banknote className="absolute -right-6 -bottom-6 size-40 opacity-5 group-hover:opacity-10" />
+            <p className="text-xs font-black uppercase text-slate-500 tracking-widest">Today's Revenue</p>
+            <h2 className="text-5xl font-black mt-3 text-white italic">Rs. {data.todayRevenue.toLocaleString()}</h2>
+            <p className="text-[10px] text-emerald-500 font-black mt-6 uppercase tracking-widest">Available for withdrawal</p>
+        </div>
+
+        {/* Order Count Card */}
+        <div className="bg-slate-900 border border-white/10 p-8 rounded-[2rem] group hover:border-blue-500/50 transition-colors">
+            <Users className="text-blue-500 mb-4" size={28} />
+            <p className="text-xs font-black uppercase text-slate-500 tracking-widest">Total Manifests</p>
+            <h2 className="text-5xl font-black mt-1 text-white italic">{data.orderCount}</h2>
+            <p className="text-[10px] text-slate-500 font-black mt-6 uppercase tracking-widest">Successful Trips</p>
+        </div>
+      </div>
+
+      {/* --- MAIN CONTENT AREA --- */}
+      <div className="bg-slate-900/40 border border-white/5 rounded-[3rem] p-8 md:p-12">
+        <div className="flex justify-between items-center mb-10">
+            <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3">
+                <History size={24} className="text-emerald-500" /> 
+                Recent Passenger Activity
+            </h3>
+            <button className="bg-white/5 hover:bg-white/10 px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors border border-white/5">
+                View Full Logs
+            </button>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4">
+            {data.recent.length > 0 ? data.recent.map((order: any, i: number) => (
+                <div key={order._id || i} className="group flex flex-col md:flex-row justify-between items-start md:items-center p-6 rounded-3xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] hover:border-emerald-500/30 transition-all">
+                    <div className="flex items-center gap-6">
+                        <div className="size-14 rounded-2xl bg-emerald-500/10 flex flex-col items-center justify-center text-emerald-500 border border-emerald-500/20">
+                            <span className="text-[10px] font-black leading-none">SEAT</span>
+                            <span className="text-lg font-black">{order.seats?.[0] || "N/A"}</span>
+                        </div>
+                        <div>
+                            <p className="text-lg font-black text-white group-hover:text-emerald-400 transition-colors">{order.user?.name || "Anonymous Passenger"}</p>
+                            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">
+                                {order.paymentMethod || "Digital"} • {order.paymentStatus || "Paid"}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div className="mt-4 md:mt-0 flex items-center gap-8 w-full md:w-auto justify-between md:justify-end">
+                        <div className="text-left md:text-right">
+                            <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Trip Route</p>
+                            <p className="text-sm font-bold text-slate-300">{order.trip?.from || "Source"} → {order.trip?.to || "Dest"}</p>
+                        </div>
+                        <div className="bg-emerald-500/10 px-6 py-3 rounded-2xl border border-emerald-500/20">
+                            <p className="text-xl font-black text-emerald-400">Rs. {order.totalAmount}</p>
+                        </div>
+                    </div>
+                </div>
+            )) : (
+                <div className="flex flex-col items-center justify-center py-24 bg-white/[0.01] rounded-[2rem] border-2 border-dashed border-white/5">
+                    <div className="size-20 bg-slate-900 rounded-full flex items-center justify-center mb-4">
+                        <History size={32} className="text-slate-700" />
+                    </div>
+                    <p className="text-slate-600 font-black uppercase tracking-[0.3em] text-sm">No transaction history found</p>
+                </div>
+            )}
+        </div>
+      </div>
     </div>
   );
 };

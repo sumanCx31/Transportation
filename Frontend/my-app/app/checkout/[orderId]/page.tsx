@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, Wallet, CheckCircle2, ArrowLeft, ShieldCheck, Bus, Ticket } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
+import authService from "@/services/auth.service";
 
 export default function CheckoutPage({ params, searchParams }: any) {
   // 1. Correctly unwrap Promises for Next.js 15
@@ -23,7 +24,7 @@ export default function CheckoutPage({ params, searchParams }: any) {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const response = await axios.get(`http://localhost:9005/api/v1/order/${orderId}`);
+        const response = await authService.getRequest(`order/${orderId}`);
         if (response.data?.data) {
           setOrder(response.data.data);
         }

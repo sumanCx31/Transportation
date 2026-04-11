@@ -8,6 +8,8 @@ import { useAuth } from "../../context/auth.context";
 
 const DriverBusPage = () => {
   const { loggedInUser } = useAuth();
+  console.log("_id",loggedInUser?._id);
+  
   const [buses, setBuses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

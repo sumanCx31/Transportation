@@ -102,11 +102,11 @@ const DriverPage = () => {
               active={location.pathname.includes("/driver/my-bus")} 
             />
           </Link>
-          <Link to="/driver/view-booking" onClick={() => setOpen(false)}>
+          <Link to="/driver/booking" onClick={() => setOpen(false)}>
             <NavItem 
               icon={<Ticket size={20} />} 
               label="Bookings" 
-              active={location.pathname.includes("/driver/view-booking")} 
+              active={location.pathname.includes("/driver/booking")} 
             />
           </Link>
           <Link to="/driver/chat" onClick={() => setOpen(false)}>

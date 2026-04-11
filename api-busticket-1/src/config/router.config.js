@@ -28,6 +28,6 @@ router.use("/book-ticket",bookingRouter);
 router.use("/driver-bus",driverRoute);
 router.use("/order",OrderRouter);
 router.use("/chat",ChatRouter);
-router.use("/offers",OfferRouter)
+router.use("/offers",OfferRouter);
 
 module.exports = router;
