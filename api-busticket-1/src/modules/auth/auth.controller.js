@@ -287,7 +287,8 @@ class AuthController {
   resetPassword = async (req, res, next) => {
     try {
       let token = req.headers.authorization;
-      token = token.replace("Bearer ", "");
+      token = token.replace("Bearer ","");
+
       const userDetail = await authSvc.verifyPasswordResetToken(token);
       const password = bcrypt.hashSync(req.body.password, 12);
       await userSvc.updateSingleUserByFilter(
@@ -315,6 +316,49 @@ class AuthController {
       next(exception);
     }
   };
+
+  changePassword = async (req, res, next) => {
+    try {
+        const userId = req.loggedInUser._id;
+        const { oldPassword, newPassword } = req.body;
+
+        // 1. Fetch user to get the current hashed password
+        const userDetail = await userSvc.getSingleUserByFilter({ _id: userId });
+
+        // 2. Verify Old Password
+        if (!bcrypt.compareSync(oldPassword, userDetail.password)) {
+            throw {
+                code: 400,
+                message: "Current password does not match.",
+                status: "OLD_PASSWORD_ERROR"
+            };
+        }
+
+        // 3. Hash New Password
+        const newHashedPassword = bcrypt.hashSync(newPassword, 12);
+
+        // 4. Update in Database
+        await userSvc.updateSingleUserByFilter(
+            { _id: userId },
+            { password: newHashedPassword }
+        );
+
+        // 5. Invalidate all existing sessions (Logout from all)
+        await authSvc.logoutFromAll({
+            user: userId,
+        });
+
+        res.json({
+            data: null,
+            message: "Password changed successfully. Please login with your new password.",
+            status: "PASSWORD_CHANGE_SUCCESS",
+            options: null,
+        });
+    } catch (exception) {
+        next(exception);
+    }
+};
+
   loggedInUserProfile = (req, res, next) => {
     res.json({
       data: req.loggedInUser,

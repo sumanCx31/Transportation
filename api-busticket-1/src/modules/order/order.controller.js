@@ -11,7 +11,7 @@ const { string } = require("joi");
 const orderModel = require("./order.model");
 
 class OrderController {
-  // 🔹 Create Order (already working, kept clean)
+  // Create Order (already working, kept clean)
   createOrder = async (req, res) => {
     try {
       const data = req.body;
@@ -62,23 +62,98 @@ class OrderController {
     }
   };
 
-  getAllOrders = async (req, res) => {
-    try {
-      const orders = await OrderModel.find()
-        .populate("trip", "from to date") // only trip name
-        .populate("user", "name email"); // only user name and email
+ getAllOrders = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-      res.status(200).json({
-        data: orders,
-        message: "Orders retrieved successfully",
-      });
-    } catch (err) {
-      res.status(500).json({
-        message: err.message,
-      });
-    }
-  };
-  // 🔹 Get Single Order
+    const [orders, totalOrders] = await Promise.all([
+      OrderModel.find()
+        .populate("trip", "from to date")
+        .populate("user", "name email")
+        .sort({ createdAt: -1 }) 
+        .skip(skip)
+        .limit(limit),
+      OrderModel.countDocuments(),
+    ]);
+
+    // 3. Calculate total pages
+    const totalPages = Math.ceil(totalOrders / limit);
+
+    res.status(200).json({
+      status: "SUCCESS",
+      data: orders,
+      pagination: {
+        totalOrders,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+      message: "Orders retrieved successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "ERROR",
+      message: err.message,
+    });
+  }
+};
+
+  totalTicketsSold = async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today (midnight)
+
+    const stats = await OrderModel.aggregate([
+      {
+        $match: { bookingStatus: "booked" }
+      },
+      {
+        $facet: {
+          // All-time stats
+          allTime: [
+            {
+              $group: {
+                _id: null,
+                totalTicketsSold: { $sum: 1 },
+                totalRevenue: { $sum: "$totalAmount" }
+              }
+            }
+          ],
+          // Stats for today only
+          today: [
+            {
+              $match: { createdAt: { $gte: today } } // Filter by today's date
+            },
+            {
+              $group: {
+                _id: null,
+                revenue: { $sum: "$totalAmount" }
+              }
+            }
+          ]
+        }
+      }
+    ]);
+
+    const allTimeData = stats[0].allTime[0] || { totalTicketsSold: 0, totalRevenue: 0 };
+    const todayData = stats[0].today[0] || { revenue: 0 };
+
+    res.status(200).json({
+      status: "SUCCESS",
+      data: {
+        totalTicketsSold: allTimeData.totalTicketsSold,
+        totalRevenue: allTimeData.totalRevenue,
+        todayRevenue: todayData.revenue // New field
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ status: "ERROR", message: error.message });
+  }
+};
+
+  // Get Single Order
   getSingleOrder = async (req, res) => {
     try {
       const _id = req.params.id;
@@ -100,7 +175,7 @@ class OrderController {
         busName: TripDetails.bus.name,
         busNumber: TripDetails.bus.busNumber,
         busType: TripDetails.bus.busType,
-      }
+      };
       if (!order) {
         return res.status(404).json({
           message: "Order not found",
@@ -114,7 +189,7 @@ class OrderController {
             busName: busDetails.busName,
             busNumber: busDetails.busNumber,
             busType: busDetails.busType,
-          }
+          },
         },
         message: "Order retrieved successfully",
       });
@@ -125,8 +200,6 @@ class OrderController {
     }
   };
 
-  // 🔹 INITIATE PAYMENT
-  // 🔹 INITIATE PAYMENT
   initiatePayment = async (req, res) => {
     try {
       const orderId = req.params.orderId;
@@ -308,7 +381,7 @@ class OrderController {
     }
   };
 
-  // 🔹 VERIFY PAYMENT (FINAL SAFE VERSION)
+  //VERIFY PAYMENT (FINAL SAFE VERSION)
   verifyPayment = async (req, res) => {
     try {
       const { pidx } = req.body;
@@ -401,7 +474,7 @@ class OrderController {
     }
   };
 
-  // 🔹 Get My Tickets
+  //  Get My Tickets
   getMyTickets = async (req, res) => {
     try {
       const pidx = req.params._id;
@@ -462,6 +535,29 @@ class OrderController {
       throw exception;
     }
   };
+
+  getTodayRevenue = async (req, res) => {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const orders = await OrderModel.find({
+        paymentStatus: "paid",
+        createdAt: { $gte: today, $lt: tomorrow },
+      });
+      const totalRevenue = orders.reduce(
+        (sum, order) => sum + (Number(order.totalAmount) || 0),
+        0,
+      );
+      res.json({
+        data: totalRevenue,
+        message: "Today's revenue retrieved successfully",
+      });
+    } catch (exception) {
+      throw exception;
+    }}
 }
 
 module.exports = new OrderController();

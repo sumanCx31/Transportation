@@ -7,11 +7,11 @@ import {
   Users,
   Ticket,
   Settings,
-  MessageCircle,
   Menu,
   X,
   Gift,
   Image as ImageIcon,
+  ChevronDown, // Added for dropdown indicator
 } from "lucide-react";
 import { Outlet, useLocation, useNavigate, Link } from "react-router"; 
 import { useAuth } from "../../../context/auth.context";
@@ -19,6 +19,7 @@ import { toast } from "sonner";
 
 const AdminPage = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false); // ✅ Added state for dropdown
   const [isAuthorizing, setIsAuthorizing] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
@@ -55,10 +56,8 @@ const AdminPage = () => {
   }
 
   return (
-    // ✅ Main container is h-screen and overflow-hidden to prevent the whole page from scrolling
     <div className="flex h-screen w-full bg-slate-950 text-slate-200 font-sans overflow-hidden">
       
-      {/* Sidebar - Fixed height and internal scroll if nav is too long */}
       <aside
         className={`fixed lg:static top-0 left-0 h-full w-72 
         bg-slate-900 border-r border-white/5 
@@ -100,11 +99,11 @@ const AdminPage = () => {
             />
           </Link>
 
-          <Link to="/admin/booking" onClick={() => setIsOpen(false)}>
+          <Link to="/admin/bookings" onClick={() => setIsOpen(false)}>
             <NavItem
               icon={<Ticket size={20} />}
               label="Bookings"
-              active={location.pathname.includes("/admin/booking")}
+              active={location.pathname.includes("/admin/bookings")}
             />
           </Link>
 
@@ -124,26 +123,33 @@ const AdminPage = () => {
             />
           </Link>
 
-          <Link to="/admin/chat" onClick={() => setIsOpen(false)}>
-            <NavItem
-              icon={<MessageCircle size={20} />}
-              label="Chat"
-              active={location.pathname.includes("/admin/chat")}
-            />
-          </Link>
+          <div className="space-y-1">
+            <button 
+              onClick={() => setSettingsOpen(!settingsOpen)} 
+              className="w-full text-left outline-none"
+            >
+              <NavItem 
+                icon={<Settings size={20} />} 
+                label="Settings" 
+                active={location.pathname.includes("/admin/settings")} 
+                isDropdown
+                isOpen={settingsOpen}
+              />
+            </button>
 
-          <div className="pt-4 mt-4 border-t border-white/5">
-             <Link to="/admin/settings" onClick={() => setIsOpen(false)}>
-                <NavItem
-                  icon={<Settings size={20} />}
-                  label="Settings"
-                  active={location.pathname.includes("/admin/settings")}
-                />
-              </Link>
+            {settingsOpen && (
+              <div className="pl-10 space-y-1 animate-in slide-in-from-top-2 duration-200">
+                <Link to="/admin/settings/profile" onClick={() => setIsOpen(false)} className="block">
+                  <SubNavItem label="Profile" active={location.pathname === "/admin/settings/profile"} />
+                </Link>
+                <Link to="/admin/settings/password" onClick={() => setIsOpen(false)} className="block">
+                  <SubNavItem label="Password" active={location.pathname === "/admin/settings/password"} />
+                </Link>
+              </div>
+            )}
           </div>
         </nav>
 
-        {/* Optional: Sidebar Footer (e.g., Profile) */}
         <div className="mt-auto pt-6 border-t border-white/5">
             <div className="flex items-center gap-3 px-2">
                 <div className="size-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500 font-bold">
@@ -157,7 +163,6 @@ const AdminPage = () => {
         </div>
       </aside>
 
-      {/* Mobile Overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm lg:hidden z-40"
@@ -165,10 +170,7 @@ const AdminPage = () => {
         />
       )}
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        
-        {/* Top Header - Mobile only or global info bar */}
         <header className="lg:hidden flex items-center justify-between p-4 border-b border-white/5 bg-slate-900">
           <div className="flex items-center">
              <button onClick={() => setIsOpen(true)} className="text-slate-400 hover:text-white">
@@ -178,9 +180,8 @@ const AdminPage = () => {
           </div>
         </header>
 
-        {/* ✅ This div captures all scrolling for the main content */}
         <main className="flex-1 overflow-y-auto scroll-smooth custom-scrollbar">
-          <div className="p-4 sm:p-6 lg:p-10 max-w-[1600px] mx-auto">
+          <div className="p-4 sm:p-6 lg:p-10 max-w-400 mx-auto">
             <Outlet />
           </div>
         </main>
@@ -190,19 +191,39 @@ const AdminPage = () => {
 };
 
 /* Nav Item Component */
-const NavItem = ({ icon, label, active = false }: any) => (
+const NavItem = ({ icon, label, active = false, isDropdown = false, isOpen = false }: any) => (
   <div
-    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-200 cursor-pointer group
+    className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all duration-200 cursor-pointer group
     ${
       active
         ? "bg-emerald-500 text-emerald-950 font-black shadow-lg shadow-emerald-500/10"
         : "hover:bg-white/5 text-slate-400 hover:text-slate-200"
     }`}
   >
-    <span className={`${active ? "text-emerald-950" : "text-slate-500 group-hover:text-emerald-500"} transition-colors`}>
-        {icon}
-    </span>
-    <span className="text-sm tracking-tight">{label}</span>
+    <div className="flex items-center gap-3">
+      <span className={`${active ? "text-emerald-950" : "text-slate-500 group-hover:text-emerald-500"} transition-colors`}>
+          {icon}
+      </span>
+      <span className="text-sm tracking-tight">{label}</span>
+    </div>
+    {/* ✅ Dropdown Icon */}
+    {isDropdown && (
+      <ChevronDown 
+        size={16} 
+        className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""} ${active ? "text-emerald-950" : "text-slate-500"}`} 
+      />
+    )}
+  </div>
+);
+
+/* ✅ Sub Nav Item Component */
+const SubNavItem = ({ label, active = false }: any) => (
+  <div className={`py-2 px-4 rounded-xl text-xs font-bold transition-all ${
+    active 
+    ? "text-emerald-500 bg-emerald-500/5" 
+    : "text-slate-500 hover:text-slate-300 hover:pl-5"
+  }`}>
+    {label}
   </div>
 );
 

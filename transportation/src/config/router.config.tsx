@@ -31,7 +31,8 @@ import AdminOfferPages from "../pages/admin/addPromo";
 import AdminBookingPage from "../pages/admin/bookingPage";
 import DriverBookingPage from "../pages/driver/bookingPage";
 import BookingDetailPage from "../pages/driver/bookingDetailPage";
-// import AdminBookingPage from "../pages/admin/bookingPage";
+import ChangePassword from "../components/changePassword";
+import userProfile from "../components/userProfile";
 
 const routerConfig = createBrowserRouter([
   {
@@ -60,6 +61,8 @@ const routerConfig = createBrowserRouter([
       { path: "banners/update/:_id", Component: updateBanner },
       { path: "banners", Component: BannerPage },
       { path: "booking", Component: AdminBookingPage },
+      {path:"settings/profile",Component:userProfile},
+      { path: "settings/password", Component: ChangePassword },
       {path: "promos", Component: PromoListPage},
       {path: "promos/add-promo", Component: AdminOfferPages},
       { path: "users", Component: Users },
@@ -75,6 +78,8 @@ const routerConfig = createBrowserRouter([
         element: <DriverDashboard />,
       },
       { path: "my-bus", Component: DriverBusPage },
+      { path: "settings/profile", Component: userProfile },
+      { path: "settings/password", Component: ChangePassword },
       { path: "trip-update/:busId", Component: DriverTripPage },
       { path: "booking", Component: DriverBookingPage },
       { path: "bookings/:_id", Component: BookingDetailPage },

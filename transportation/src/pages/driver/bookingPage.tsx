@@ -64,7 +64,7 @@ const DriverBookingPage = () => {
       
       {/* --- STATS CARDS --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-slate-900 border border-white/5 p-6 rounded-[2rem] flex items-center gap-5">
+        <div className="bg-slate-900 border border-white/5 p-6 rounded-4xl flex items-center gap-5">
           <div className="size-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500 border border-emerald-500/20">
             <Banknote size={28} />
           </div>
@@ -74,7 +74,7 @@ const DriverBookingPage = () => {
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-white/5 p-6 rounded-[2rem] flex items-center gap-5">
+        <div className="bg-slate-900 border border-white/5 p-6 rounded-4xl flex items-center gap-5">
           <div className="size-14 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500 border border-blue-500/20">
             <Ticket size={28} />
           </div>
@@ -115,7 +115,7 @@ const DriverBookingPage = () => {
                   <td colSpan={5} className="p-20 text-center animate-pulse text-slate-500 font-black uppercase tracking-[0.3em]">Syncing Bookings...</td>
                 </tr>
               ) : bookings.map((order) => (
-                <tr key={order._id} className="group hover:bg-white/[0.02] transition-all">
+                <tr key={order._id} className="group hover:bg-white/2 transition-all">
                   <td className="p-6">
                     <div className="flex items-center gap-3">
                       <div className="size-10 bg-slate-950 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-emerald-500 transition-colors">
@@ -135,7 +135,7 @@ const DriverBookingPage = () => {
                   </td>
                   <td className="p-6">
                     <div className="flex flex-col gap-1">
-                        <span className="text-[10px] font-black uppercase text-slate-500 truncate max-w-[120px]">
+                        <span className="text-[10px] font-black uppercase text-slate-500 truncate max-w-30">
                             {order.trip.bus.name}
                         </span>
                         <div className="flex gap-1 flex-wrap">
@@ -172,7 +172,7 @@ const DriverBookingPage = () => {
         </div>
 
         {/* --- PAGINATION CONTROLS --- */}
-        <div className="p-6 bg-white/[0.02] flex items-center justify-between border-t border-white/5">
+        <div className="p-6 bg-white/2 flex items-center justify-between border-t border-white/5">
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
             Page {pagination.currentPage} of {pagination.totalPages}
           </p>
